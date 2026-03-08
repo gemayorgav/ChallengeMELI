@@ -1,57 +1,25 @@
 {
   "info": {
-    "name": "MELI Challenge - Phase 2 (Essentials + Robustez)",
-    "description": "Colección completa con Fase 1 (Esenciales) + Fase 2 (Paginación + JSON Logging) - Endpoints actualizados y validados",
+    "name": "MELI Challenge - Phase 2 Actualizado",
+    "description": "API MELI con endpoints completos: CRUD, Paginación, Validación y Health Checks",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-  },
-  "auth": {
-    "type": "bearer",
-    "bearer": [
-      {
-        "key": "token",
-        "value": "{{token}}",
-        "type": "string"
-      }
-    ]
   },
   "variable": [
     {
       "key": "base_url",
-      "value": "http://localhost:8080",
-      "type": "string",
-      "description": "URL base de la API"
+      "value": "http://localhost:8080"
     },
     {
       "key": "token",
-      "value": "",
-      "type": "string",
-      "description": "JWT Token obtenido del login"
+      "value": ""
     }
   ],
   "item": [
     {
-      "name": "1. AUTENTICACION",
-      "description": "Endpoints de autenticación JWT - Obtén el token para acceder a endpoints protegidos",
+      "name": "1. Autenticación",
       "item": [
         {
-          "name": "1.1 Login - testuser",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "if (pm.response.code === 200) {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.variables.set(\"token\", jsonData.token);",
-                  "    console.log('✅ Token guardado para testuser');",
-                  "} else {",
-                  "    console.log('❌ Error en login');",
-                  "}"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
+          "name": "Login - testuser",
           "request": {
             "method": "POST",
             "header": [
@@ -62,36 +30,17 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"password123\"\n}"
+              "raw": "{\"username\":\"testuser\",\"password\":\"password123\"}"
             },
             "url": {
               "raw": "{{base_url}}/api/v1/auth/login",
               "host": ["{{base_url}}"],
               "path": ["api", "v1", "auth", "login"]
-            },
-            "description": "Login con usuario de prueba\n\n**Credenciales:**\n- Username: testuser\n- Password: password123"
-          },
-          "response": []
+            }
+          }
         },
         {
-          "name": "1.2 Login - admin",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "if (pm.response.code === 200) {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.variables.set(\"token\", jsonData.token);",
-                  "    console.log('✅ Token guardado para admin');",
-                  "} else {",
-                  "    console.log('❌ Error en login');",
-                  "}"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
+          "name": "Login - admin",
           "request": {
             "method": "POST",
             "header": [
@@ -102,137 +51,84 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+              "raw": "{\"username\":\"admin\",\"password\":\"admin123\"}"
             },
             "url": {
               "raw": "{{base_url}}/api/v1/auth/login",
               "host": ["{{base_url}}"],
               "path": ["api", "v1", "auth", "login"]
-            },
-            "description": "Login con usuario admin\n\n**Credenciales:**\n- Username: admin\n- Password: admin123"
-          },
-          "response": []
+            }
+          }
         }
       ]
     },
     {
-      "name": "2. DOCUMENTACION & SALUD",
-      "description": "Acceso a documentación OpenAPI y estado de la aplicación",
+      "name": "2. Health & Docs",
       "item": [
         {
-          "name": "2.1 Swagger UI",
+          "name": "Health Check",
           "request": {
             "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/swagger-ui.html",
-              "host": ["{{base_url}}"],
-              "path": ["swagger-ui.html"]
-            },
-            "description": "Interfaz Swagger para explorar la API interactivamente"
-          },
-          "response": []
-        },
-        {
-          "name": "2.2 OpenAPI JSON",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/v3/api-docs",
-              "host": ["{{base_url}}"],
-              "path": ["v3", "api-docs"]
-            },
-            "description": "Especificación completa en formato OpenAPI 3.0"
-          },
-          "response": []
-        },
-        {
-          "name": "2.3 Health Check - Completo",
-          "request": {
-            "method": "GET",
-            "header": [],
             "url": {
               "raw": "{{base_url}}/api/v1/actuator/health",
               "host": ["{{base_url}}"],
               "path": ["api", "v1", "actuator", "health"]
-            },
-            "description": "Estado completo de la aplicación (BD, disco, liveness, readiness)"
-          },
-          "response": []
+            }
+          }
         },
         {
-          "name": "2.4 Health Liveness",
+          "name": "Swagger UI",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/actuator/health/liveness",
+              "raw": "{{base_url}}/swagger-ui.html",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "actuator", "health", "liveness"]
-            },
-            "description": "Liveness: ¿está activo el servicio? (usado por K8s)"
-          },
-          "response": []
+              "path": ["swagger-ui.html"]
+            }
+          }
         },
         {
-          "name": "2.5 Health Readiness",
+          "name": "OpenAPI Spec",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
-              "raw": "{{base_url}}/api/v1/actuator/health/readiness",
+              "raw": "{{base_url}}/v3/api-docs",
               "host": ["{{base_url}}"],
-              "path": ["api", "v1", "actuator", "health", "readiness"]
-            },
-            "description": "Readiness: ¿está listo para recibir tráfico?"
-          },
-          "response": []
+              "path": ["v3", "api-docs"]
+            }
+          }
         }
       ]
     },
     {
-      "name": "3. CRUD OPERATIONS",
-      "description": "Operaciones CRUD con todos los campos validados",
+      "name": "3. CRUD - Crear",
       "item": [
         {
-          "name": "3.1 Limpiar BD - DELETE /models/erase",
+          "name": "Limpiar BD",
           "request": {
             "method": "DELETE",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{}"
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
             "url": {
               "raw": "{{base_url}}/api/v1/models/erase",
               "host": ["{{base_url}}"],
               "path": ["api", "v1", "models", "erase"]
-            },
-            "description": "Elimina TODOS los productos (limpia la BD)"
-          },
-          "response": []
+            }
+          }
         },
         {
-          "name": "3.2 Crear - iPhone 15 Pro Max",
+          "name": "Crear - iPhone 15",
           "request": {
             "method": "POST",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -240,32 +136,24 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": 1,\n  \"name\": \"iPhone 15 Pro Max\",\n  \"description\": \"Premium smartphone con cámara de 48MP, pantalla Dynamic Island de 6.7 pulgadas, procesador A17 Pro\",\n  \"category\": \"Electrónica/Celulares\",\n  \"price\": 1199.99,\n  \"discountPercentage\": 10,\n  \"installmentMonths\": 12,\n  \"color\": \"Titanio Negro\",\n  \"size\": \"6.7 pulgadas\",\n  \"material\": \"Titanio quirúrgico\",\n  \"brand\": \"Apple\",\n  \"model\": \"iPhone 15 Pro Max\",\n  \"stock\": 45,\n  \"isAvailable\": true,\n  \"isNew\": true,\n  \"condition\": \"Nueva\",\n  \"rating\": 4.8,\n  \"reviewCount\": 2450,\n  \"vendorId\": 1,\n  \"vendorName\": \"Apple Premium Store\",\n  \"vendorRating\": 4.9,\n  \"vendorReviewCount\": 12500,\n  \"paymentMethods\": [\"CREDIT_CARD\", \"DEBIT_CARD\", \"MERCADO_PAGO\"],\n  \"imageUrls\": [\"https://s3.amazonaws.com/images/iphone15-1.jpg\"],\n  \"mainImageUrl\": \"https://s3.amazonaws.com/images/iphone15-main.jpg\",\n  \"status\": \"ACTIVO\",\n  \"hasWarranty\": true,\n  \"warrantyInfo\": \"Garantía 2 años\",\n  \"isFreeShipping\": true,\n  \"shippingCost\": 0,\n  \"estimatedShippingDays\": 2,\n  \"sku\": \"APPLE-IP15PM-256GB\"\n}"
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
+              "raw": "{\"id\":1,\"name\":\"iPhone 15 Pro Max\",\"description\":\"Premium smartphone con cámara 48MP\",\"category\":\"Electrónica\",\"price\":1199.99,\"discountPercentage\":10,\"installmentMonths\":12,\"color\":\"Titanio Negro\",\"size\":\"6.7 pulgadas\",\"material\":\"Titanio\",\"brand\":\"Apple\",\"model\":\"iPhone 15 Pro Max\",\"stock\":45,\"isAvailable\":true,\"isNew\":true,\"condition\":\"Nueva\",\"rating\":4.8,\"reviewCount\":2450,\"vendorId\":1,\"vendorName\":\"Apple Store\",\"vendorRating\":4.9,\"vendorReviewCount\":12500,\"paymentMethods\":[\"CREDIT_CARD\",\"MERCADO_PAGO\"],\"imageUrls\":[\"https://example.com/img1.jpg\"],\"mainImageUrl\":\"https://example.com/main.jpg\",\"status\":\"ACTIVO\",\"hasWarranty\":true,\"warrantyInfo\":\"2 años\",\"isFreeShipping\":true,\"shippingCost\":0,\"estimatedShippingDays\":2,\"sku\":\"APPLE-IP15-256GB\"}"
             },
             "url": {
               "raw": "{{base_url}}/api/v1/models",
               "host": ["{{base_url}}"],
               "path": ["api", "v1", "models"]
-            },
-            "description": "Crear nuevo producto\n\n**Valores validados:**\n- condition: Nueva, Usado, Recondicionado\n- status: ACTIVO, INACTIVO, SUSPENDIDO\n- price: > 0\n- stock: >= 0\n- rating: 0-5\n- name: 3-255 caracteres"
-          },
-          "response": []
+            }
+          }
         },
         {
-          "name": "3.3 Crear - Samsung Galaxy S24",
+          "name": "Crear - Samsung S24",
           "request": {
             "method": "POST",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -273,32 +161,24 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": 2,\n  \"name\": \"Samsung Galaxy S24 Ultra\",\n  \"description\": \"Smartphone flagship con pantalla Dynamic AMOLED 2X de 6.8 pulgadas, procesador Snapdragon 8 Gen 3\",\n  \"category\": \"Electrónica/Celulares\",\n  \"price\": 1299.99,\n  \"discountPercentage\": 15,\n  \"installmentMonths\": 18,\n  \"color\": \"Titanio Gris\",\n  \"size\": \"6.8 pulgadas\",\n  \"material\": \"Gorilla Glass Armor\",\n  \"brand\": \"Samsung\",\n  \"model\": \"Galaxy S24 Ultra\",\n  \"stock\": 32,\n  \"isAvailable\": true,\n  \"isNew\": true,\n  \"condition\": \"Nueva\",\n  \"rating\": 4.7,\n  \"reviewCount\": 1890,\n  \"vendorId\": 2,\n  \"vendorName\": \"Samsung Experience Store\",\n  \"vendorRating\": 4.8,\n  \"vendorReviewCount\": 8900,\n  \"paymentMethods\": [\"CREDIT_CARD\", \"DEBIT_CARD\", \"MERCADO_PAGO\"],\n  \"imageUrls\": [\"https://s3.amazonaws.com/images/samsung-s24-1.jpg\"],\n  \"mainImageUrl\": \"https://s3.amazonaws.com/images/samsung-s24-main.jpg\",\n  \"status\": \"ACTIVO\",\n  \"hasWarranty\": true,\n  \"warrantyInfo\": \"Garantía Samsung 2 años\",\n  \"isFreeShipping\": true,\n  \"shippingCost\": 0,\n  \"estimatedShippingDays\": 3,\n  \"sku\": \"SAMSUNG-S24U-256GB\"\n}"
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
+              "raw": "{\"id\":2,\"name\":\"Samsung Galaxy S24\",\"description\":\"Smartphone flagship con AMOLED 6.8\",\"category\":\"Electrónica\",\"price\":1299.99,\"discountPercentage\":15,\"installmentMonths\":18,\"color\":\"Titanio Gris\",\"size\":\"6.8 pulgadas\",\"material\":\"Gorilla Glass\",\"brand\":\"Samsung\",\"model\":\"Galaxy S24\",\"stock\":32,\"isAvailable\":true,\"isNew\":true,\"condition\":\"Nueva\",\"rating\":4.7,\"reviewCount\":1890,\"vendorId\":2,\"vendorName\":\"Samsung Store\",\"vendorRating\":4.8,\"vendorReviewCount\":8900,\"paymentMethods\":[\"CREDIT_CARD\",\"MERCADO_PAGO\"],\"imageUrls\":[\"https://example.com/s24.jpg\"],\"mainImageUrl\":\"https://example.com/s24-main.jpg\",\"status\":\"ACTIVO\",\"hasWarranty\":true,\"warrantyInfo\":\"2 años Samsung\",\"isFreeShipping\":true,\"shippingCost\":0,\"estimatedShippingDays\":3,\"sku\":\"SAMSUNG-S24-256GB\"}"
             },
             "url": {
               "raw": "{{base_url}}/api/v1/models",
               "host": ["{{base_url}}"],
               "path": ["api", "v1", "models"]
-            },
-            "description": "Crear segundo producto"
-          },
-          "response": []
+            }
+          }
         },
         {
-          "name": "3.4 Crear - Producto Usado",
+          "name": "Crear - Producto Usado",
           "request": {
             "method": "POST",
             "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
               {
                 "key": "Content-Type",
                 "value": "application/json"
@@ -306,276 +186,318 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": 3,\n  \"name\": \"MacBook Pro 16 M2\",\n  \"description\": \"Laptop profesional de segunda mano, en excelente estado, poco uso\",\n  \"category\": \"Electrónica/Computadoras\",\n  \"price\": 1599.99,\n  \"discountPercentage\": 20,\n  \"installmentMonths\": 12,\n  \"color\": \"Gris Espacial\",\n  \"size\": \"16 pulgadas\",\n  \"material\": \"Aluminio\",\n  \"brand\": \"Apple\",\n  \"model\": \"MacBook Pro 16\",\n  \"stock\": 5,\n  \"isAvailable\": true,\n  \"isNew\": false,\n  \"condition\": \"Usado\",\n  \"rating\": 4.5,\n  \"reviewCount\": 320,\n  \"vendorId\": 3,\n  \"vendorName\": \"Tech Reseller Store\",\n  \"vendorRating\": 4.6,\n  \"vendorReviewCount\": 890,\n  \"paymentMethods\": [\"CREDIT_CARD\", \"MERCADO_PAGO\"],\n  \"imageUrls\": [\"https://s3.amazonaws.com/images/macbook-1.jpg\"],\n  \"mainImageUrl\": \"https://s3.amazonaws.com/images/macbook-main.jpg\",\n  \"status\": \"ACTIVO\",\n  \"hasWarranty\": true,\n  \"warrantyInfo\": \"Garantía 1 año\",\n  \"isFreeShipping\": false,\n  \"shippingCost\": 50,\n  \"estimatedShippingDays\": 5,\n  \"sku\": \"APPLE-MBP16-M2-USED\"\n}"
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
+              "raw": "{\"id\":3,\"name\":\"MacBook Pro 16 M2\",\"description\":\"Usado en excelente estado\",\"category\":\"Computadoras\",\"price\":1599.99,\"discountPercentage\":20,\"installmentMonths\":12,\"color\":\"Gris\",\"size\":\"16 pulgadas\",\"material\":\"Aluminio\",\"brand\":\"Apple\",\"model\":\"MacBook Pro 16\",\"stock\":5,\"isAvailable\":true,\"isNew\":false,\"condition\":\"Usado\",\"rating\":4.5,\"reviewCount\":320,\"vendorId\":3,\"vendorName\":\"Tech Reseller\",\"vendorRating\":4.6,\"vendorReviewCount\":890,\"paymentMethods\":[\"CREDIT_CARD\"],\"imageUrls\":[\"https://example.com/mb.jpg\"],\"mainImageUrl\":\"https://example.com/mb-main.jpg\",\"status\":\"ACTIVO\",\"hasWarranty\":true,\"warrantyInfo\":\"1 año\",\"isFreeShipping\":false,\"shippingCost\":50,\"estimatedShippingDays\":5,\"sku\":\"APPLE-MBP-USED\"}"
             },
             "url": {
               "raw": "{{base_url}}/api/v1/models",
               "host": ["{{base_url}}"],
               "path": ["api", "v1", "models"]
-            },
-            "description": "Crear producto con condition='Usado'"
-          },
-          "response": []
+            }
+          }
         }
       ]
     },
     {
-      "name": "4. LISTADO - PAGINACION (PHASE 2)",
-      "description": "Endpoints de paginación - Phase 2: Robustez",
+      "name": "4. CRUD - Listar (Paginación)",
       "item": [
         {
-          "name": "4.1 Listar - Página 0 (10 elementos)",
+          "name": "Listar - Página 0",
           "request": {
             "method": "GET",
-            "header": [],
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/api/v1/models?page=0&size=10&sort=id&direction=asc",
               "host": ["{{base_url}}"],
               "path": ["api", "v1", "models"],
               "query": [
-                {
-                  "key": "page",
-                  "value": "0",
-                  "description": "Número de página (0-based)"
-                },
-                {
-                  "key": "size",
-                  "value": "10",
-                  "description": "Elementos por página"
-                },
-                {
-                  "key": "sort",
-                  "value": "id",
-                  "description": "Campo para ordenar (id, name, price, rating, stock)"
-                },
-                {
-                  "key": "direction",
-                  "value": "asc",
-                  "description": "Dirección: asc o desc"
-                }
+                {"key": "page", "value": "0"},
+                {"key": "size", "value": "10"},
+                {"key": "sort", "value": "id"},
+                {"key": "direction", "value": "asc"}
               ]
-            },
-            "description": "Listar primera página con 10 elementos ordenados por ID ascendente"
-          },
-          "response": []
+            }
+          }
         },
         {
-          "name": "4.2 Listar - Ordenado por precio (desc)",
+          "name": "Listar - Por precio (DESC)",
           "request": {
             "method": "GET",
-            "header": [],
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/api/v1/models?page=0&size=10&sort=price&direction=desc",
               "host": ["{{base_url}}"],
               "path": ["api", "v1", "models"],
               "query": [
-                {
-                  "key": "page",
-                  "value": "0"
-                },
-                {
-                  "key": "size",
-                  "value": "10"
-                },
-                {
-                  "key": "sort",
-                  "value": "price",
-                  "description": "Ordenar por precio"
-                },
-                {
-                  "key": "direction",
-                  "value": "desc",
-                  "description": "Mayor a menor"
-                }
+                {"key": "page", "value": "0"},
+                {"key": "size", "value": "10"},
+                {"key": "sort", "value": "price"},
+                {"key": "direction", "value": "desc"}
               ]
-            },
-            "description": "Listar productos ordenados por precio de mayor a menor"
-          },
-          "response": []
+            }
+          }
         },
         {
-          "name": "4.3 Listar - Ordenado por rating (desc)",
+          "name": "Listar - Top 5 rating",
           "request": {
             "method": "GET",
-            "header": [],
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/api/v1/models?page=0&size=5&sort=rating&direction=desc",
               "host": ["{{base_url}}"],
               "path": ["api", "v1", "models"],
               "query": [
-                {
-                  "key": "page",
-                  "value": "0"
-                },
-                {
-                  "key": "size",
-                  "value": "5",
-                  "description": "Solo 5 elementos por página"
-                },
-                {
-                  "key": "sort",
-                  "value": "rating"
-                },
-                {
-                  "key": "direction",
-                  "value": "desc"
-                }
+                {"key": "page", "value": "0"},
+                {"key": "size", "value": "5"},
+                {"key": "sort", "value": "rating"},
+                {"key": "direction", "value": "desc"}
               ]
-            },
-            "description": "Listar top 5 productos mejor calificados"
-          },
-          "response": []
+            }
+          }
         },
         {
-          "name": "4.4 Listar - Ordenado por nombre (asc)",
+          "name": "Listar - Alfabético",
           "request": {
             "method": "GET",
-            "header": [],
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
             "url": {
-              "raw": "{{base_url}}/api/v1/models?page=0&size=20&sort=name&direction=asc",
+              "raw": "{{base_url}}/api/v1/models?page=0&size=10&sort=name&direction=asc",
               "host": ["{{base_url}}"],
               "path": ["api", "v1", "models"],
               "query": [
-                {
-                  "key": "page",
-                  "value": "0"
-                },
-                {
-                  "key": "size",
-                  "value": "20"
-                },
-                {
-                  "key": "sort",
-                  "value": "name"
-                },
-                {
-                  "key": "direction",
-                  "value": "asc"
-                }
+                {"key": "page", "value": "0"},
+                {"key": "size", "value": "10"},
+                {"key": "sort", "value": "name"},
+                {"key": "direction", "value": "asc"}
               ]
-            },
-            "description": "Listar productos alfabéticamente (A-Z)"
-          },
-          "response": []
-        },
-        {
-          "name": "4.5 Listar - Página 1 (siguiente página)",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{base_url}}/api/v1/models?page=1&size=10&sort=id&direction=asc",
-              "host": ["{{base_url}}"],
-              "path": ["api", "v1", "models"],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1",
-                  "description": "Segunda página"
-                },
-                {
-                  "key": "size",
-                  "value": "10"
-                },
-                {
-                  "key": "sort",
-                  "value": "id"
-                },
-                {
-                  "key": "direction",
-                  "value": "asc"
-                }
-              ]
-            },
-            "description": "Listar segunda página (elementos 11-20)"
-          },
-          "response": []
+            }
+          }
         }
       ]
     },
     {
-      "name": "5. CONSULTAS INDIVIDUALES",
-      "description": "Obtener detalles de un producto específico",
+      "name": "5. CRUD - Leer",
       "item": [
         {
-          "name": "5.1 Obtener Detalles - ID 1",
+          "name": "Obtener ID 1",
           "request": {
             "method": "GET",
-            "header": [],
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
             "url": {
               "raw": "{{base_url}}/api/v1/models/details?id=1",
               "host": ["{{base_url}}"],
               "path": ["api", "v1", "models", "details"],
               "query": [
-                {
-                  "key": "id",\n                  \"value\": \"1\"\n                }\n              ]\n            },\n            \"description\": \"Obtiene detalles completos del producto con ID=1\"\n          },\n          \"response\": []\n        },\n        {\n          \"name\": \"5.2 Obtener Detalles - ID 2\",\n          \"request\": {\n            \"method\": \"GET\",\n            \"header\": [],\n            \"auth\": {\n              \"type\": \"bearer\",\n              \"bearer\": [\n                {\n                  \"key\": \"token\",\n                  \"value\": \"{{token}}\",\n                  \"type\": \"string\"\n                }\n              ]\n            },\n            \"url\": {\n              \"raw\": \"{{base_url}}/api/v1/models/details?id=2\",\n              \"host\": [\"{{base_url}}\"],\n              \"path\": [\"api\", \"v1\", \"models\", \"details\"],\n              \"query\": [\n                {\n                  \"key\": \"id\",\n                  \"value\": \"2\"\n                }\n              ]\n            },\n            \"description\": \"Obtiene detalles completos del producto con ID=2\"\n          },\n          \"response\": []\n        }\n      ]\n    },\n    {\n      \"name\": \"6. ACTUALIZAR & ELIMINAR\",\n      \"description\": \"Operaciones de actualización y eliminación\",\n      \"item\": [\n        {\n          \"name\": \"6.1 Actualizar - Cambiar precio (PUT)\",\n          \"request\": {\n            \"method\": \"PUT\",\n            \"header\": [\n              {\n                \"key\": \"Content-Type\",\n                \"value\": \"application/json\"\n              }\n            ],\n            \"body\": {\n              \"mode\": \"raw\",\n              \"raw\": \"{\\n  \\\"id\\\": 1,\\n  \\\"price\\\": 899.99\\n}\"\n            },\n            \"auth\": {\n              \"type\": \"bearer\",\n              \"bearer\": [\n                {\n                  \"key\": \"token\",\n                  \"value\": \"{{token}}\",\n                  \"type\": \"string\"\n                }\n              ]\n            },\n            \"url\": {\n              \"raw\": \"{{base_url}}/api/v1/models\",\n              \"host\": [\"{{base_url}}\"],\n              \"path\": [\"api\", \"v1\", \"models\"]\n            },\n            \"description\": \"Actualiza solo el precio del producto ID=1. Solo envía los campos a cambiar.\"\n          },\n          \"response\": []\n        },\n        {\n          \"name\": \"6.2 Actualizar - Cambiar stock y rating\",\n          \"request\": {\n            \"method\": \"PUT\",\n            \"header\": [\n              {\n                \"key\": \"Content-Type\",\n                \"value\": \"application/json\"\n              }\n            ],\n            \"body\": {\n              \"mode\": \"raw\",\n              \"raw\": \"{\\n  \\\"id\\\": 1,\\n  \\\"stock\\\": 20,\\n  \\\"rating\\\": 4.9\\n}\"\n            },\n            \"auth\": {\n              \"type\": \"bearer\",\n              \"bearer\": [\n                {\n                  \"key\": \"token\",\n                  \"value\": \"{{token}}\",\n                  \"type\": \"string\"\n                }\n              ]\n            },\n            \"url\": {\n              \"raw\": \"{{base_url}}/api/v1/models\",\n              \"host\": [\"{{base_url}}\"],\n              \"path\": [\"api\", \"v1\", \"models\"]\n            },\n            \"description\": \"Actualiza múltiples campos: stock y rating\"\n          },\n          \"response\": []\n        },\n        {\n          \"name\": \"6.3 Actualizar - Cambiar estado a SUSPENDIDO\",\n          \"request\": {\n            \"method\": \"PUT\",\n            \"header\": [\n              {\n                \"key\": \"Content-Type\",\n                \"value\": \"application/json\"\n              }\n            ],\n            \"body\": {\n              \"mode\": \"raw\",\n              \"raw\": \"{\\n  \\\"id\\\": 2,\\n  \\\"status\\\": \\\"SUSPENDIDO\\\"\\n}\"\n            },\n            \"auth\": {\n              \"type\": \"bearer\",\n              \"bearer\": [\n                {\n                  \"key\": \"token\",\n                  \"value\": \"{{token}}\",\n                  \"type\": \"string\"\n                }\n              ]\n            },\n            \"url\": {\n              \"raw\": \"{{base_url}}/api/v1/models\",\n              \"host\": [\"{{base_url}}\"],\n              \"path\": [\"api\", \"v1\", \"models\"]\n            },\n            \"description\": \"Cambia estado a SUSPENDIDO (valores válidos: ACTIVO, INACTIVO, SUSPENDIDO)\"\n          },\n          \"response\": []\n        },\n        {\n          \"name\": \"6.4 Eliminar - DELETE /models (ID 3)\",\n          \"request\": {\n            \"method\": \"DELETE\",\n            \"header\": [\n              {\n                \"key\": \"Content-Type\",\n                \"value\": \"application/json\"\n              }\n            ],\n            \"body\": {\n              \"mode\": \"raw\",\n              \"raw\": \"{\\\"id\\\": 3}\"\n            },\n            \"auth\": {\n              \"type\": \"bearer\",\n              \"bearer\": [\n                {\n                  \"key\": \"token\",\n                  \"value\": \"{{token}}\",\n                  \"type\": \"string\"\n                }\n              ]\n            },\n            \"url\": {\n              \"raw\": \"{{base_url}}/api/v1/models\",\n              \"host\": [\"{{base_url}}\"],\n              \"path\": [\"api\", \"v1\", \"models\"]\n            },\n            \"description\": \"Elimina el producto con ID=3\"\n          },\n          \"response\": []\n        }\n      ]\n    },\n    {\n      \"name\": \"7. ERROR HANDLING\",\n      \"description\": \"Ejemplos de validación y manejo de errores\",\n      \"item\": [\n        {\n          \"name\": \"7.1 Error - Condition inválida\",\n          \"request\": {\n            \"method\": \"POST\",\n            \"header\": [\n              {\n                \"key\": \"Content-Type\",\n                \"value\": \"application/json\"\n              }\n            ],\n            \"body\": {\n              \"mode\": \"raw\",\n              \"raw\": \"{\\n  \\\"id\\\": 99,\\n  \\\"name\\\": \\\"Test\\\",\\n  \\\"description\\\": \\\"Test product\\\",\\n  \\\"category\\\": \\\"Test\\\",\\n  \\\"price\\\": 100,\\n  \\\"brand\\\": \\\"Test\\\",\\n  \\\"model\\\": \\\"Test\\\",\\n  \\\"condition\\\": \\\"INVALID\\\",\\n  \\\"status\\\": \\\"ACTIVO\\\",\\n  \\\"stock\\\": 10,\\n  \\\"isAvailable\\\": true,\\n  \\\"isNew\\\": true,\\n  \\\"rating\\\": 5,\\n  \\\"reviewCount\\\": 0,\\n  \\\"vendorId\\\": 1,\\n  \\\"vendorName\\\": \\\"Test\\\",\\n  \\\"paymentMethods\\\": [\\\"CREDIT_CARD\\\"],\\n  \\\"imageUrls\\\": [\\\"http://test.com/img.jpg\\\"],\\n  \\\"mainImageUrl\\\": \\\"http://test.com/main.jpg\\\"\\n}\"\n            },\n            \"auth\": {\n              \"type\": \"bearer\",\n              \"bearer\": [\n                {\n                  \"key\": \"token\",\n                  \"value\": \"{{token}}\",\n                  \"type\": \"string\"\n                }\n              ]\n            },\n            \"url\": {\n              \"raw\": \"{{base_url}}/api/v1/models\",\n              \"host\": [\"{{base_url}}\"],\n              \"path\": [\"api\", \"v1\", \"models\"]\n            },\n            \"description\": \"Intenta crear con condition inválida\\n\\nValores correctos: Nueva, Usado, Recondicionado\\n\\nRetorna 400 Bad Request\"\n          },\n          \"response\": []\n        },\n        {\n          \"name\": \"7.2 Error - Status inválido\",\n          \"request\": {\n            \"method\": \"POST\",\n            \"header\": [\n              {\n                \"key\": \"Content-Type\",\n                \"value\": \"application/json\"\n              }\n            ],\n            \"body\": {\n              \"mode\": \"raw\",\n              \"raw\": \"{\\n  \\\"id\\\": 99,\\n  \\\"name\\\": \\\"Test\\\",\\n  \\\"description\\\": \\\"Test product\\\",\\n  \\\"category\\\": \\\"Test\\\",\\n  \\\"price\\\": 100,\\n  \\\"brand\\\": \\\"Test\\\",\\n  \\\"model\\\": \\\"Test\\\",\\n  \\\"condition\\\": \\\"Nueva\\\",\\n  \\\"status\\\": \\\"UNKNOWN\\\",\\n  \\\"stock\\\": 10,\\n  \\\"isAvailable\\\": true,\\n  \\\"isNew\\\": true,\\n  \\\"rating\\\": 5,\\n  \\\"reviewCount\\\": 0,\\n  \\\"vendorId\\\": 1,\\n  \\\"vendorName\\\": \\\"Test\\\",\\n  \\\"paymentMethods\\\": [\\\"CREDIT_CARD\\\"],\\n  \\\"imageUrls\\\": [\\\"http://test.com/img.jpg\\\"],\\n  \\\"mainImageUrl\\\": \\\"http://test.com/main.jpg\\\"\\n}\"\n            },\n            \"auth\": {\n              \"type\": \"bearer\",\n              \"bearer\": [\n                {\n                  \"key\": \"token\",\n                  \"value\": \"{{token}}\",\n                  \"type\": \"string\"\n                }\n              ]\n            },\n            \"url\": {\n              \"raw\": \"{{base_url}}/api/v1/models\",\n              \"host\": [\"{{base_url}}\"],\n              \"path\": [\"api\", \"v1\", \"models\"]\n            },\n            \"description\": \"Intenta crear con status inválido\\n\\nValores correctos: ACTIVO, INACTIVO, SUSPENDIDO\\n\\nRetorna 400 Bad Request\"\n          },\n          \"response\": []\n        },\n        {\n          \"name\": \"7.3 Error - Not Found (ID no existe)\",\n          \"request\": {\n            \"method\": \"GET\",\n            \"header\": [],\n            \"auth\": {\n              \"type\": \"bearer\",\n              \"bearer\": [\n                {\n                  \"key\": \"token\",\n                  \"value\": \"{{token}}\",\n                  \"type\": \"string\"\n                }\n              ]\n            },\n            \"url\": {\n              \"raw\": \"{{base_url}}/api/v1/models/details?id=9999\",\n              \"host\": [\"{{base_url}}\"],\n              \"path\": [\"api\", \"v1\", \"models\", \"details\"],\n              \"query\": [\n                {\n                  \"key\": \"id\",\n                  \"value\": \"9999\"\n                }\n              ]\n            },\n            \"description\": \"Intenta obtener producto inexistente\\n\\nRetorna 404 Not Found\"\n          },\n          \"response\": []\n        },\n        {\n          \"name\": \"7.4 Error - Missing required fields\",\n          \"request\": {\n            \"method\": \"POST\",\n            \"header\": [\n              {\n                \"key\": \"Content-Type\",\n                \"value\": \"application/json\"\n              }\n            ],\n            \"body\": {\n              \"mode\": \"raw\",\n              \"raw\": \"{\\n  \\\"id\\\": 99,\\n  \\\"name\\\": \\\"Test\\\"\\n}\"\n            },\n            \"auth\": {\n              \"type\": \"bearer\",\n              \"bearer\": [\n                {\n                  \"key\": \"token\",\n                  \"value\": \"{{token}}\",\n                  \"type\": \"string\"\n                }\n              ]\n            },\n            \"url\": {\n              \"raw\": \"{{base_url}}/api/v1/models\",\n              \"host\": [\"{{base_url}}\"],\n              \"path\": [\"api\", \"v1\", \"models\"]\n            },\n            \"description\": \"Intenta crear sin campos requeridos\\n\\nRetorna 400 Bad Request con detalles de validación\"\n          },\n          \"response\": []\n        }\n      ]\n    }\n  ]\n}\n
+                {"key": "id", "value": "1"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener ID 2",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/models/details?id=2",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models", "details"],
+              "query": [
+                {"key": "id", "value": "2"}
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. CRUD - Actualizar",
+      "item": [
+        {
+          "name": "Cambiar precio",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id\":1,\"price\":899.99}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models"]
+            }
+          }
+        },
+        {
+          "name": "Cambiar stock y rating",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id\":1,\"stock\":20,\"rating\":4.9}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models"]
+            }
+          }
+        },
+        {
+          "name": "Cambiar estado a SUSPENDIDO",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id\":2,\"status\":\"SUSPENDIDO\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. CRUD - Eliminar",
+      "item": [
+        {
+          "name": "Eliminar ID 3",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id\":3}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Validación & Errores",
+      "item": [
+        {
+          "name": "Error 400 - Condition inválida",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id\":99,\"name\":\"Test\",\"description\":\"Test\",\"category\":\"Test\",\"price\":100,\"brand\":\"Test\",\"model\":\"Test\",\"condition\":\"INVALID\",\"status\":\"ACTIVO\",\"stock\":10,\"isAvailable\":true,\"isNew\":true,\"rating\":5,\"reviewCount\":0,\"vendorId\":1,\"vendorName\":\"Test\",\"paymentMethods\":[\"CREDIT_CARD\"],\"imageUrls\":[\"http://test.jpg\"],\"mainImageUrl\":\"http://test.jpg\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models"]
+            }
+          }
+        },
+        {
+          "name": "Error 404 - Not Found",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/models/details?id=9999",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models", "details"],
+              "query": [
+                {"key": "id", "value": "9999"}
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
