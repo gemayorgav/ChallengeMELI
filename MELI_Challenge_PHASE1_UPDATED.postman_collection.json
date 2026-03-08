@@ -1,8 +1,18 @@
 {
   "info": {
-    "name": "MELI Challenge - Phase 1 (Essentials)",
-    "description": "Colección actualizada con valores de validación correctos - Fase 1 con OpenAPI, Health Checks y Validación completa",
+    "name": "MELI Challenge - Phase 2 (Essentials + Robustez)",
+    "description": "Colección completa actualizada - Fase 1 (Esenciales) + Fase 2 (Paginación + JSON Logging)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
   },
   "variable": [
     {
