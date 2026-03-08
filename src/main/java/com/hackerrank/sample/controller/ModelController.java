@@ -1,58 +1,408 @@
 package com.hackerrank.sample.controller;
 
+import com.hackerrank.sample.audit.AuditService;
+import com.hackerrank.sample.dto.ModelOperationRequest;
 import com.hackerrank.sample.model.Model;
+import com.hackerrank.sample.security.AuthService;
 import com.hackerrank.sample.service.ModelService;
-import java.util.List;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
+@RequestMapping("/api/v1")
 public class ModelController {
+    
+    private static final Logger log = LoggerFactory.getLogger(ModelController.class);
     @Autowired
     private ModelService modelService;
+
+    @Autowired
+    private AuditService auditService;
+
+    @Autowired
+    private AuthService authService;
 
     @GetMapping("/")
     @ResponseBody
     public String home() {
-        return "Default Java 21 Project Home Page";
+        return "MELI Challenge API - Secure Backend with JWT Authentication";
     }
 
-    @RequestMapping(value = "/model", method = RequestMethod.POST, consumes = "application/json")
+    /**
+     * Crear nuevo modelo
+     * Requiere autenticación via JWT token
+     * POST /api/v1/models con todos los campos del producto
+     */
+    @PostMapping("/models")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createNewModel(@RequestBody @Valid Model model) {
-        modelService.createModel(model);
+    @CircuitBreaker(name = "modelService", fallbackMethod = "fallbackCreateModel")
+    @Retry(name = "modelService")
+    public ResponseEntity<?> createModel(
+            @RequestBody @Valid ModelOperationRequest request,
+            HttpServletRequest httpRequest) {
+        
+        String username = extractUsername(httpRequest);
+        
+        try {
+            Model model = new Model();
+            // Básico
+            model.setId(request.getId());
+            model.setName(request.getName());
+            model.setDescription(request.getDescription());
+            model.setCategory(request.getCategory());
+            
+            // Precios
+            model.setPrice(request.getPrice());
+            model.setDiscountPercentage(request.getDiscountPercentage());
+            model.setInstallmentMonths(request.getInstallmentMonths());
+            
+            // Características
+            model.setColor(request.getColor());
+            model.setSize(request.getSize());
+            model.setMaterial(request.getMaterial());
+            model.setBrand(request.getBrand());
+            model.setModel(request.getModel());
+            
+            // Stock
+            model.setStock(request.getStock());
+            model.setIsAvailable(request.getIsAvailable());
+            
+            // Condición
+            model.setIsNew(request.getIsNew());
+            model.setCondition(request.getCondition());
+            
+            // Calificación
+            model.setRating(request.getRating());
+            model.setReviewCount(request.getReviewCount());
+            
+            // Vendedor
+            model.setVendorId(request.getVendorId());
+            model.setVendorName(request.getVendorName());
+            model.setVendorRating(request.getVendorRating());
+            model.setVendorReviewCount(request.getVendorReviewCount());
+            
+            // Medios de pago
+            if(request.getPaymentMethods() != null) {
+                model.setPaymentMethods(request.getPaymentMethods());
+            }
+            
+            // Imágenes
+            if(request.getImageUrls() != null) {
+                model.setImageUrls(request.getImageUrls());
+            }
+            model.setMainImageUrl(request.getMainImageUrl());
+            
+            // Información adicional
+            model.setStatus(request.getStatus() != null ? request.getStatus() : "ACTIVE");
+            model.setHasWarranty(request.getHasWarranty());
+            model.setWarrantyInfo(request.getWarrantyInfo());
+            model.setIsFreeShipping(request.getIsFreeShipping());
+            model.setShippingCost(request.getShippingCost());
+            model.setEstimatedShippingDays(request.getEstimatedShippingDays());
+            model.setSku(request.getSku());
+            
+            modelService.createModel(model);
+            
+            auditService.logOperation(
+                username, "ModelService", "POST", "/api/v1/models",
+                "CREATE_MODEL", "SUCCESS", "201", 
+                "Product: " + request.getName() + " | Price: " + request.getPrice()
+            );
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Modelo creado exitosamente");
+            response.put("id", request.getId());
+            response.put("name", request.getName());
+            response.put("price", request.getPrice());
+            response.put("timestamp", LocalDateTime.now());
+            
+            log.info("[API] Usuario: {} - Creó producto: {} (ID: {}) - Precio: {} - Status: 201", 
+                username, request.getName(), request.getId(), request.getPrice());
+            
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+            
+        } catch (Exception e) {
+            auditService.logOperation(
+                username, "ModelService", "POST", "/api/v1/models",
+                "CREATE_MODEL", "FAILED", "400", e.getMessage()
+            );
+            
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", e.getMessage());
+            error.put("timestamp", LocalDateTime.now());
+            
+            log.error("[API] Usuario: {} - Error creando modelo: {}", username, e.getMessage());
+            
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
     }
 
-    @RequestMapping(value = "/erase", method = RequestMethod.DELETE)
+    /**
+     * Obtener todos los modelos
+     * Requiere autenticación via JWT token
+     * GET /api/v1/models
+     */
+    @GetMapping("/models")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteAllModels() {
-        modelService.deleteAllModels();
+    @CircuitBreaker(name = "modelService", fallbackMethod = "fallbackListModels")
+    @Retry(name = "modelService")
+    public ResponseEntity<?> getAllModels(HttpServletRequest httpRequest) {
+        String username = extractUsername(httpRequest);
+        
+        try {
+            List<Model> models = modelService.getAllModels();
+            
+            auditService.logOperation(
+                username, "ModelService", "GET", "/api/v1/models",
+                "LIST_MODELS", "SUCCESS", "200", 
+                "Retrieved " + models.size() + " models"
+            );
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("data", models);
+            response.put("count", models.size());
+            response.put("timestamp", LocalDateTime.now());
+            
+            log.info("[API] Usuario: {} - Listó {} modelos - Status: 200", username, models.size());
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            auditService.logOperation(
+                username, "ModelService", "GET", "/api/v1/models",
+                "LIST_MODELS", "FAILED", "500", e.getMessage()
+            );
+            
+            log.error("[API] Usuario: {} - Error listando modelos: {}", username, e.getMessage());
+            return new ResponseEntity<>(
+                Map.of("success", false, "message", e.getMessage()),
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
     }
 
-    @RequestMapping(value = "/model/{id}", method = RequestMethod.DELETE)
+    /**
+     * Obtener modelo por ID
+     * Requiere autenticación via JWT token
+     */
+    @PostMapping("/models/details")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteModelById(@PathVariable Long id) {
-        modelService.deleteModelById(id);
+    @CircuitBreaker(name = "modelService", fallbackMethod = "fallbackGetModel")
+    @Retry(name = "modelService")
+    public ResponseEntity<?> getModelById(
+            @RequestBody @Valid ModelOperationRequest request,
+            HttpServletRequest httpRequest) {
+        
+        String username = extractUsername(httpRequest);
+        
+        try {
+            Model model = modelService.getModelById(request.getId());
+            
+            auditService.logOperation(
+                username, "ModelService", "POST", "/api/v1/models/details",
+                "GET_MODEL", "SUCCESS", "200", "Model ID: " + request.getId()
+            );
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("data", model);
+            response.put("timestamp", LocalDateTime.now());
+            
+            log.info("[API] Usuario: {} - Obtuvo modelo ID: {} - Status: 200", username, request.getId());
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            auditService.logOperation(
+                username, "ModelService", "POST", "/api/v1/models/details",
+                "GET_MODEL", "FAILED", "404", "Model ID: " + request.getId()
+            );
+            
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", e.getMessage());
+            error.put("timestamp", LocalDateTime.now());
+            
+            log.error("[API] Usuario: {} - Modelo no encontrado ID: {}", username, request.getId());
+            
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
     }
 
-    @RequestMapping(value = "/model", method = RequestMethod.GET)
+    /**
+     * Eliminar modelo por ID
+     * Requiere autenticación via JWT token
+     * DELETE /api/v1/models con body {"id": 1}
+     * Retorna 404 si el modelo no existe
+     */
+    @DeleteMapping("/models")
     @ResponseStatus(HttpStatus.OK)
-    public List<Model> getAllModels() {
-        return modelService.getAllModels();
+    @CircuitBreaker(name = "modelService", fallbackMethod = "fallbackDeleteModel")
+    @Retry(name = "modelService")
+    public ResponseEntity<?> deleteModelById(
+            @RequestBody @Valid ModelOperationRequest request,
+            HttpServletRequest httpRequest) {
+        
+        String username = extractUsername(httpRequest);
+        
+        try {
+            modelService.deleteModelById(request.getId());
+            
+            auditService.logOperation(
+                username, "ModelService", "DELETE", "/api/v1/models",
+                "DELETE_MODEL", "SUCCESS", "200", "Model ID: " + request.getId()
+            );
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Modelo eliminado exitosamente");
+            response.put("id", request.getId());
+            response.put("timestamp", LocalDateTime.now());
+            
+            log.info("[API] Usuario: {} - Eliminó modelo ID: {} - Status: 200", username, request.getId());
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            auditService.logOperation(
+                username, "ModelService", "DELETE", "/api/v1/models",
+                "DELETE_MODEL", "FAILED", "404", e.getMessage()
+            );
+            
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", e.getMessage());
+            error.put("timestamp", LocalDateTime.now());
+            
+            log.error("[API] Usuario: {} - Modelo no encontrado para eliminar ID: {}", username, request.getId());
+            
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
     }
 
-    @RequestMapping(value = "/model/{id}", method = RequestMethod.GET)
+    /**
+     * Limpiar todos los modelos
+     * Requiere autenticación via JWT token
+     * DELETE /api/v1/models/erase
+     */
+    @DeleteMapping("/models/erase")
     @ResponseStatus(HttpStatus.OK)
-    public Model getModelById(@PathVariable Long id) {
-        return modelService.getModelById(id);
+    @CircuitBreaker(name = "modelService", fallbackMethod = "fallbackEraseAll")
+    @Retry(name = "modelService")
+    public ResponseEntity<?> deleteAllModels(HttpServletRequest httpRequest) {
+        String username = extractUsername(httpRequest);
+        
+        try {
+            modelService.deleteAllModels();
+            
+            auditService.logOperation(
+                username, "ModelService", "DELETE", "/api/v1/models/erase",
+                "ERASE_ALL", "SUCCESS", "200", "All models deleted"
+            );
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Todos los modelos han sido eliminados");
+            response.put("timestamp", LocalDateTime.now());
+            
+            log.info("[API] Usuario: {} - Eliminó todos los modelos - Status: 200", username);
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            auditService.logOperation(
+                username, "ModelService", "POST", "/api/v1/models/erase",
+                "ERASE_ALL", "FAILED", "500", e.getMessage()
+            );
+            
+            log.error("[API] Usuario: {} - Error eliminando todos los modelos: {}", username, e.getMessage());
+            
+            return new ResponseEntity<>(
+                Map.of("success", false, "message", e.getMessage()),
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    // Métodos fallback para Circuit Breaker
+    
+    public ResponseEntity<?> fallbackCreateModel(ModelOperationRequest request, HttpServletRequest httpRequest, Exception ex) {
+        String username = extractUsername(httpRequest);
+        log.warn("[API-FALLBACK] Usuario: {} - CircuitBreaker abierto en createModel: {}", username, ex.getMessage());
+        return new ResponseEntity<>(
+            Map.of("success", false, "message", "Servicio temporalmente no disponible"),
+            HttpStatus.SERVICE_UNAVAILABLE
+        );
+    }
+    
+    public ResponseEntity<?> fallbackListModels(HttpServletRequest httpRequest, Exception ex) {
+        String username = extractUsername(httpRequest);
+        log.warn("[API-FALLBACK] Usuario: {} - CircuitBreaker abierto en listModels: {}", username, ex.getMessage());
+        return new ResponseEntity<>(
+            Map.of("success", false, "message", "Servicio temporalmente no disponible"),
+            HttpStatus.SERVICE_UNAVAILABLE
+        );
+    }
+    
+    public ResponseEntity<?> fallbackGetModel(ModelOperationRequest request, HttpServletRequest httpRequest, Exception ex) {
+        String username = extractUsername(httpRequest);
+        log.warn("[API-FALLBACK] Usuario: {} - CircuitBreaker abierto en getModel: {}", username, ex.getMessage());
+        return new ResponseEntity<>(
+            Map.of("success", false, "message", "Servicio temporalmente no disponible"),
+            HttpStatus.SERVICE_UNAVAILABLE
+        );
+    }
+    
+    public ResponseEntity<?> fallbackDeleteModel(ModelOperationRequest request, HttpServletRequest httpRequest, Exception ex) {
+        String username = extractUsername(httpRequest);
+        log.warn("[API-FALLBACK] Usuario: {} - CircuitBreaker abierto en deleteModel: {}", username, ex.getMessage());
+        return new ResponseEntity<>(
+            Map.of("success", false, "message", "Servicio temporalmente no disponible"),
+            HttpStatus.SERVICE_UNAVAILABLE
+        );
+    }
+    
+    public ResponseEntity<?> fallbackEraseAll(HttpServletRequest httpRequest, Exception ex) {
+        String username = extractUsername(httpRequest);
+        log.warn("[API-FALLBACK] Usuario: {} - CircuitBreaker abierto en eraseAll: {}", username, ex.getMessage());
+        return new ResponseEntity<>(
+            Map.of("success", false, "message", "Servicio temporalmente no disponible"),
+            HttpStatus.SERVICE_UNAVAILABLE
+        );
+    }
+
+    /**
+     * Extrae el username del token JWT del header Authorization
+     */
+    private String extractUsername(HttpServletRequest httpRequest) {
+        String authHeader = httpRequest.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            String username = authService.getUsernameFromToken(token);
+            return username != null ? username : "UNKNOWN";
+        }
+        return "UNKNOWN";
     }
 }

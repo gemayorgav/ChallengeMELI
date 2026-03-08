@@ -1,0 +1,610 @@
+{
+  "info": {
+    "name": "MELI Challenge - Secure API with JWT",
+    "description": "Colección actualizada con autenticación JWT, auditoría y resiliencia. Endpoints refactorizados bajo /api/v1/",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "AUTENTICACIÓN",
+      "description": "Endpoints de autenticación JWT",
+      "item": [
+        {
+          "name": "1. Login - testuser",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Obtiene JWT token para usuario testuser (role: USER)"
+          },
+          "response": []
+        },
+        {
+          "name": "2. Login - admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Obtiene JWT token para usuario admin (role: ADMIN)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "CRUD OPERATIONS",
+      "description": "Operaciones CRUD sobre modelos - REQUIEREN AUTENTICACIÓN JWT",
+      "item": [
+        {
+          "name": "1. Limpiar DB - Erase",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/models/erase",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "models",
+                "erase"
+              ]
+            },
+            "description": "Elimina todos los modelos de la base de datos. Requiere token JWT en header Authorization."
+          },
+          "response": []
+        },
+        {
+          "name": "2. Listar modelos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/models/list",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "models",
+                "list"
+              ]
+            },
+            "description": "Obtiene lista de todos los modelos. Retorna array vacío si no hay modelos."
+          },
+          "response": []
+        },
+        {
+          "name": "3. Crear modelo - iPhone 15",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"name\": \"iPhone 15\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/models/create",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "models",
+                "create"
+              ]
+            },
+            "description": "Crea un nuevo modelo. IMPORTANTE: ID y nombre van en el JSON, no en la URL."
+          },
+          "response": []
+        },
+        {
+          "name": "4. Crear modelo - iPhone 16",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 2,\n  \"name\": \"iPhone 16 Pro\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/models/create",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "models",
+                "create"
+              ]
+            },
+            "description": "Crea un segundo modelo"
+          },
+          "response": []
+        },
+        {
+          "name": "5. Crear modelo - Samsung Galaxy S24",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 3,\n  \"name\": \"Samsung Galaxy S24\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/models/create",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "models",
+                "create"
+              ]
+            },
+            "description": "Crea un tercer modelo"
+          },
+          "response": []
+        },
+        {
+          "name": "6. Listar modelos creados",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/models/list",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "models",
+                "list"
+              ]
+            },
+            "description": "Obtiene lista de modelos creados (debe tener 3 elementos)"
+          },
+          "response": []
+        },
+        {
+          "name": "7. Obtener detalle - ID 1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/models/details",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "models",
+                "details"
+              ]
+            },
+            "description": "Obtiene detalle de un modelo específico por ID (en JSON body)"
+          },
+          "response": []
+        },
+        {
+          "name": "8. Obtener detalle - ID 2",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 2\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/models/details",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "models",
+                "details"
+              ]
+            },
+            "description": "Obtiene detalle del modelo iPhone 16 Pro"
+          },
+          "response": []
+        },
+        {
+          "name": "9. Eliminar modelo - ID 3",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 3\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/models/delete",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "models",
+                "delete"
+              ]
+            },
+            "description": "Elimina un modelo por ID (en JSON body)"
+          },
+          "response": []
+        },
+        {
+          "name": "10. Listar modelos restantes",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/models/list",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "models",
+                "list"
+              ]
+            },
+            "description": "Obtiene lista de modelos restantes (debe tener 2 elementos sin el Samsung)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "SEGURIDAD & VALIDACIÓN",
+      "description": "Pruebas de seguridad y validación de autenticación",
+      "item": [
+        {
+          "name": "1. Sin token - Debe fallar (401)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/models/list",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "models",
+                "list"
+              ]
+            },
+            "description": "Intenta acceder a endpoint protegido sin token JWT. Debe retornar 401 Unauthorized"
+          },
+          "response": []
+        },
+        {
+          "name": "2. Token inválido - Debe fallar (401)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer invalid.token.here"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/models/list",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "models",
+                "list"
+              ]
+            },
+            "description": "Intenta acceder con token inválido. Debe retornar 401 Unauthorized"
+          },
+          "response": []
+        },
+        {
+          "name": "3. Login fallido - Usuario no existe",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"usuarioinexistente\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Intenta login con usuario que no existe. Debe retornar 401 Unauthorized con mensaje de error"
+          },
+          "response": []
+        },
+        {
+          "name": "4. Login fallido - Contraseña incorrecta",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"wrongpassword\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Intenta login con contraseña incorrecta. Debe retornar 401 Unauthorized con mensaje de error"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "INFORMACIÓN",
+      "description": "Endpoints informativos",
+      "item": [
+        {
+          "name": "Home",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                ""
+              ]
+            },
+            "description": "Obtiene mensaje de bienvenida de la API"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "token",
+      "value": "",
+      "description": "JWT Token obtenido del endpoint /auth/login. Copia el valor del campo 'token' de la respuesta aquí.\nEjemplo: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6..."
+    }
+  ]
+}

@@ -1,6 +1,12 @@
 {
   "version": "0.2.0",
   "configurations": [
-
+    {
+      "type": "java",
+      "name": "Application",
+      "request": "launch",
+      "mainClass": "com.hackerrank.sample.Application",
+      "projectName": "sample"
+    }
   ]
 }

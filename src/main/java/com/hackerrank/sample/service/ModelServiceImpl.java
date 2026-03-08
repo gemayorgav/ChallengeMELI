@@ -21,6 +21,10 @@ public class ModelServiceImpl implements ModelService {
 
     @Override
     public void deleteModelById(Long id) {
+        Optional<Model> model = modelRepository.findById(id);
+        if (model.isEmpty()) {
+            throw new NoSuchResourceFoundException("No model with given id found.");
+        }
         modelRepository.deleteById(id);
     }
 

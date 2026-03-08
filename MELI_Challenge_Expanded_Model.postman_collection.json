@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "MELI Challenge - Expanded Product Model v3",
-    "description": "Colección completa para probar el modelo de producto expandido con 40+ campos (similar a Mercado Libre). Incluye ejemplos de productos reales.",
+    "name": "MELI Challenge - Expanded Product Model",
+    "description": "Colección para probar el modelo de producto expandido con 40+ campos similar a Mercado Libre",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -18,8 +18,8 @@
   ],
   "item": [
     {
-      "name": "1️⃣ AUTENTICACIÓN JWT",
-      "description": "Endpoints de autenticación para obtener tokens Bearer",
+      "name": "AUTENTICACION",
+      "description": "Endpoints de autenticacion JWT",
       "item": [
         {
           "name": "1.1 Login - testuser",
@@ -33,21 +33,15 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"password123\"\n}"
+              "raw": "{\"username\":\"testuser\",\"password\":\"password123\"}"
             },
             "url": {
               "raw": "{{base_url}}/auth/login",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "8080",
-              "path": [
-                "auth",
-                "login"
-              ]
-            },
-            "description": "Obtiene JWT token para usuario testuser\n\n**Response:** Token para usar en Bearer Authorization\n\n**⚠️ IMPORTANTE:** Copiar el token del response y guardarlo en la variable `token`"
+              "path": ["auth", "login"]
+            }
           },
           "response": []
         },
@@ -63,29 +57,23 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+              "raw": "{\"username\":\"admin\",\"password\":\"admin123\"}"
             },
             "url": {
               "raw": "{{base_url}}/auth/login",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "8080",
-              "path": [
-                "auth",
-                "login"
-              ]
-            },
-            "description": "Obtiene JWT token para usuario admin\n\n**Response:** Token para usar en Bearer Authorization"
+              "path": ["auth", "login"]
+            }
           },
           "response": []
         }
       ]
     },
     {
-      "name": "2️⃣ GESTIÓN DE BASE DE DATOS",
-      "description": "Operaciones de limpieza e inicialización",
+      "name": "CRUD BASICO",
+      "description": "Operaciones CRUD basicas",
       "item": [
         {
           "name": "2.1 Limpiar BD - DELETE /models/erase",
@@ -108,29 +96,21 @@
             "url": {
               "raw": "{{base_url}}/api/v1/models/erase",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "8080",
-              "path": [
-                "api",
-                "v1",
-                "models",
-                "erase"
-              ]
-            },
-            "description": "Elimina TODOS los productos de la BD\n\n**Método:** DELETE\n**Requiere:** Bearer Token\n**Response:** 204 No Content"
+              "path": ["api", "v1", "models", "erase"]
+            }
           },
           "response": []
         }
       ]
     },
     {
-      "name": "3️⃣ CREAR PRODUCTOS (POST /models)",
-      "description": "Ejemplos de creación de productos completos con todos los 40+ campos",
+      "name": "CREAR PRODUCTOS",
+      "description": "Ejemplos de creacion de productos con todos los campos",
       "item": [
         {
-          "name": "3.1 iPhone 15 Pro Max (Completo)",
+          "name": "3.1 iPhone 15 Pro Max",
           "request": {
             "method": "POST",
             "header": [
@@ -145,22 +125,15 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": 1,\n  \"name\": \"iPhone 15 Pro Max\",\n  \"description\": \"Premium smartphone con cámara de 48MP, pantalla Dynamic Island de 6.7 pulgadas con ProMotion 120Hz, procesador A17 Pro, batería de 4685mAh con carga rápida de 45W, resistencia IP68, y diseño premium de titanio quirúrgico\",\n  \"category\": \"Electrónica/Celulares/Smartphones Premium\",\n  \"price\": 1199.99,\n  \"discountPercentage\": 10,\n  \"discountedPrice\": 1079.99,\n  \"installmentMonths\": 12,\n  \"color\": \"Titanio Negro\",\n  \"size\": \"6.7 pulgadas\",\n  \"material\": \"Titanio quirúrgico, Ceramic Shield, Corning Gorilla Glass\",\n  \"brand\": \"Apple\",\n  \"model\": \"iPhone 15 Pro Max\",\n  \"stock\": 45,\n  \"isAvailable\": true,\n  \"isNew\": true,\n  \"condition\": \"NEW\",\n  \"rating\": 4.8,\n  \"reviewCount\": 2450,\n  \"vendorId\": 1,\n  \"vendorName\": \"Apple Premium Store Oficial\",\n  \"vendorRating\": 4.9,\n  \"vendorReviewCount\": 12500,\n  \"paymentMethods\": [\n    \"CREDIT_CARD\",\n    \"DEBIT_CARD\",\n    \"MERCADO_PAGO\",\n    \"CRYPTO_PAYMENT\",\n    \"INSTALLMENT_PLAN\"\n  ],\n  \"imageUrls\": [\n    \"https://s3.amazonaws.com/meli-images/iphone15-pro-max-1.jpg\",\n    \"https://s3.amazonaws.com/meli-images/iphone15-pro-max-2.jpg\",\n    \"https://s3.amazonaws.com/meli-images/iphone15-pro-max-3.jpg\",\n    \"https://s3.amazonaws.com/meli-images/iphone15-pro-max-4.jpg\"\n  ],\n  \"mainImageUrl\": \"https://s3.amazonaws.com/meli-images/iphone15-pro-max-main.jpg\",\n  \"hasWarranty\": true,\n  \"warrantyInfo\": \"Garantía internacional de 2 años + AppleCare+ disponible\",\n  \"isFreeShipping\": true,\n  \"shippingCost\": 0,\n  \"estimatedShippingDays\": 2,\n  \"sku\": \"APPLE-IP15PM-TI-256GB-2026\",\n  \"status\": \"ACTIVE\"\n}"
+              "raw": "{\"id\":1,\"name\":\"iPhone 15 Pro Max\",\"description\":\"Premium smartphone con camara de 48MP, pantalla Dynamic Island de 6.7 pulgadas, procesador A17 Pro, bateria de 4685mAh\",\"category\":\"Electronica/Celulares\",\"price\":1199.99,\"discountPercentage\":10,\"discountedPrice\":1079.99,\"installmentMonths\":12,\"color\":\"Titanio Negro\",\"size\":\"6.7 pulgadas\",\"material\":\"Titanio quirurgico\",\"brand\":\"Apple\",\"model\":\"iPhone 15 Pro Max\",\"stock\":45,\"isAvailable\":true,\"isNew\":true,\"condition\":\"NEW\",\"rating\":4.8,\"reviewCount\":2450,\"vendorId\":1,\"vendorName\":\"Apple Premium Store\",\"vendorRating\":4.9,\"vendorReviewCount\":12500,\"paymentMethods\":[\"CREDIT_CARD\",\"DEBIT_CARD\",\"MERCADO_PAGO\",\"CRYPTO_PAYMENT\",\"INSTALLMENT_PLAN\"],\"imageUrls\":[\"https://s3.amazonaws.com/images/iphone15-1.jpg\",\"https://s3.amazonaws.com/images/iphone15-2.jpg\"],\"mainImageUrl\":\"https://s3.amazonaws.com/images/iphone15-main.jpg\",\"hasWarranty\":true,\"warrantyInfo\":\"Garantia 2 anos\",\"isFreeShipping\":true,\"shippingCost\":0,\"estimatedShippingDays\":2,\"sku\":\"APPLE-IP15PM-256GB\",\"status\":\"ACTIVE\"}"
             },
             "url": {
               "raw": "{{base_url}}/api/v1/models",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "8080",
-              "path": [
-                "api",
-                "v1",
-                "models"
-              ]
-            },
-            "description": "Crea un producto iPhone 15 Pro Max con TODOS los 40+ campos:\n\n**Campos principales:**\n- Información básica (name, description, category)\n- Precios y ofertas (price, discount, installments)\n- Características (color, size, material, brand, model)\n- Stock y disponibilidad (stock, isAvailable)\n- Condición (isNew, condition)\n- Calificación (rating, reviewCount)\n- Información del vendedor (vendorId, vendorName, rating)\n- Medios de pago (paymentMethods array)\n- Imágenes (imageUrls array, mainImageUrl)\n- Garantía y envío\n- SKU y estado\n\n**Response:** 201 Created + objeto producto completo con metadata (createdAt, updatedAt)"
+              "path": ["api", "v1", "models"]
+            }
           },
           "response": []
         },
@@ -180,27 +153,20 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": 2,\n  \"name\": \"Samsung Galaxy S24 Ultra\",\n  \"description\": \"Smartphone flagship con pantalla Dynamic AMOLED 2X de 6.8 pulgadas, procesador Snapdragon 8 Gen 3 Leading Version, cámara triple 200MP con zoom 10x óptico, batería 5000mAh con carga rápida 45W, IP68 water resistant\",\n  \"category\": \"Electrónica/Celulares/Smartphones Premium\",\n  \"price\": 1299.99,\n  \"discountPercentage\": 15,\n  \"discountedPrice\": 1104.99,\n  \"installmentMonths\": 18,\n  \"color\": \"Titanio Gris\",\n  \"size\": \"6.8 pulgadas\",\n  \"material\": \"Gorilla Glass Armor, Marco Titanio\",\n  \"brand\": \"Samsung\",\n  \"model\": \"Galaxy S24 Ultra\",\n  \"stock\": 32,\n  \"isAvailable\": true,\n  \"isNew\": true,\n  \"condition\": \"NEW\",\n  \"rating\": 4.7,\n  \"reviewCount\": 1890,\n  \"vendorId\": 2,\n  \"vendorName\": \"Samsung Experience Store\",\n  \"vendorRating\": 4.8,\n  \"vendorReviewCount\": 8900,\n  \"paymentMethods\": [\n    \"CREDIT_CARD\",\n    \"DEBIT_CARD\",\n    \"MERCADO_PAGO\",\n    \"BANK_TRANSFER\",\n    \"INSTALLMENT_PLAN\"\n  ],\n  \"imageUrls\": [\n    \"https://s3.amazonaws.com/meli-images/samsung-s24-ultra-1.jpg\",\n    \"https://s3.amazonaws.com/meli-images/samsung-s24-ultra-2.jpg\",\n    \"https://s3.amazonaws.com/meli-images/samsung-s24-ultra-3.jpg\"\n  ],\n  \"mainImageUrl\": \"https://s3.amazonaws.com/meli-images/samsung-s24-ultra-main.jpg\",\n  \"hasWarranty\": true,\n  \"warrantyInfo\": \"Garantía oficial Samsung 2 años\",\n  \"isFreeShipping\": true,\n  \"shippingCost\": 0,\n  \"estimatedShippingDays\": 3,\n  \"sku\": \"SAMSUNG-S24U-256GB-TI-2026\",\n  \"status\": \"ACTIVE\"\n}"
+              "raw": "{\"id\":2,\"name\":\"Samsung Galaxy S24 Ultra\",\"description\":\"Smartphone flagship con pantalla Dynamic AMOLED 2X de 6.8 pulgadas, procesador Snapdragon 8 Gen 3\",\"category\":\"Electronica/Celulares\",\"price\":1299.99,\"discountPercentage\":15,\"discountedPrice\":1104.99,\"installmentMonths\":18,\"color\":\"Titanio Gris\",\"size\":\"6.8 pulgadas\",\"material\":\"Gorilla Glass Armor\",\"brand\":\"Samsung\",\"model\":\"Galaxy S24 Ultra\",\"stock\":32,\"isAvailable\":true,\"isNew\":true,\"condition\":\"NEW\",\"rating\":4.7,\"reviewCount\":1890,\"vendorId\":2,\"vendorName\":\"Samsung Experience Store\",\"vendorRating\":4.8,\"vendorReviewCount\":8900,\"paymentMethods\":[\"CREDIT_CARD\",\"DEBIT_CARD\",\"MERCADO_PAGO\",\"BANK_TRANSFER\"],\"imageUrls\":[\"https://s3.amazonaws.com/images/samsung-s24-1.jpg\",\"https://s3.amazonaws.com/images/samsung-s24-2.jpg\"],\"mainImageUrl\":\"https://s3.amazonaws.com/images/samsung-s24-main.jpg\",\"hasWarranty\":true,\"warrantyInfo\":\"Garantia Samsung 2 anos\",\"isFreeShipping\":true,\"shippingCost\":0,\"estimatedShippingDays\":3,\"sku\":\"SAMSUNG-S24U-256GB\",\"status\":\"ACTIVE\"}"
             },
             "url": {
               "raw": "{{base_url}}/api/v1/models",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "8080",
-              "path": [
-                "api",
-                "v1",
-                "models"
-              ]
-            },
-            "description": "Crea producto Samsung Galaxy S24 Ultra con todos los campos"
+              "path": ["api", "v1", "models"]
+            }
           },
           "response": []
         },
         {
-          "name": "3.3 Sony WH-1000XM5 Headphones",
+          "name": "3.3 Sony Headphones WH-1000XM5",
           "request": {
             "method": "POST",
             "header": [
@@ -215,27 +181,20 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": 3,\n  \"name\": \"Sony WH-1000XM5 Wireless Headphones\",\n  \"description\": \"Auriculares inalámbricos premium con cancelación de ruido industrial de clase mundial, sonido de alta calidad con drivers de 30mm, autonomía de 30 horas, carga rápida USB-C, diseño ligero y plegable\",\n  \"category\": \"Electrónica/Audio/Auriculares Premium\",\n  \"price\": 399.99,\n  \"discountPercentage\": 20,\n  \"discountedPrice\": 319.99,\n  \"installmentMonths\": 6,\n  \"color\": \"Negro Brillante\",\n  \"size\": \"Talla única\",\n  \"material\": \"Plástico reforzado, Almohadillas de espuma de memoria\",\n  \"brand\": \"Sony\",\n  \"model\": \"WH-1000XM5\",\n  \"stock\": 87,\n  \"isAvailable\": true,\n  \"isNew\": false,\n  \"condition\": \"LIKE_NEW\",\n  \"rating\": 4.9,\n  \"reviewCount\": 5230,\n  \"vendorId\": 3,\n  \"vendorName\": \"Sony Audio Specialists\",\n  \"vendorRating\": 4.95,\n  \"vendorReviewCount\": 24500,\n  \"paymentMethods\": [\n    \"CREDIT_CARD\",\n    \"DEBIT_CARD\",\n    \"MERCADO_PAGO\",\n    \"APPLE_PAY\",\n    \"GOOGLE_PAY\"\n  ],\n  \"imageUrls\": [\n    \"https://s3.amazonaws.com/meli-images/sony-wh1000xm5-1.jpg\",\n    \"https://s3.amazonaws.com/meli-images/sony-wh1000xm5-2.jpg\"\n  ],\n  \"mainImageUrl\": \"https://s3.amazonaws.com/meli-images/sony-wh1000xm5-main.jpg\",\n  \"hasWarranty\": true,\n  \"warrantyInfo\": \"Garantía de 1 año del fabricante\",\n  \"isFreeShipping\": false,\n  \"shippingCost\": 15.00,\n  \"estimatedShippingDays\": 5,\n  \"sku\": \"SONY-WH1000XM5-BK-2026\",\n  \"status\": \"ACTIVE\"\n}"
+              "raw": "{\"id\":3,\"name\":\"Sony WH-1000XM5 Headphones\",\"description\":\"Auriculares inalambricos premium con cancelacion de ruido, autonomia de 30 horas\",\"category\":\"Electronica/Audio\",\"price\":399.99,\"discountPercentage\":20,\"discountedPrice\":319.99,\"installmentMonths\":6,\"color\":\"Negro\",\"size\":\"Talla unica\",\"material\":\"Plastico reforzado\",\"brand\":\"Sony\",\"model\":\"WH-1000XM5\",\"stock\":87,\"isAvailable\":true,\"isNew\":false,\"condition\":\"LIKE_NEW\",\"rating\":4.9,\"reviewCount\":5230,\"vendorId\":3,\"vendorName\":\"Sony Audio Specialists\",\"vendorRating\":4.95,\"vendorReviewCount\":24500,\"paymentMethods\":[\"CREDIT_CARD\",\"DEBIT_CARD\",\"MERCADO_PAGO\"],\"imageUrls\":[\"https://s3.amazonaws.com/images/sony-wh1000xm5-1.jpg\"],\"mainImageUrl\":\"https://s3.amazonaws.com/images/sony-wh1000xm5-main.jpg\",\"hasWarranty\":true,\"warrantyInfo\":\"Garantia 1 ano\",\"isFreeShipping\":false,\"shippingCost\":15.00,\"estimatedShippingDays\":5,\"sku\":\"SONY-WH1000XM5\",\"status\":\"ACTIVE\"}"
             },
             "url": {
               "raw": "{{base_url}}/api/v1/models",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "8080",
-              "path": [
-                "api",
-                "v1",
-                "models"
-              ]
-            },
-            "description": "Crea producto Sony WH-1000XM5 Headphones con ejemplo de producto no nuevo (LIKE_NEW) y envío pagado"
+              "path": ["api", "v1", "models"]
+            }
           },
           "response": []
         },
         {
-          "name": "3.4 Apple MacBook Pro 16 M3 Max",
+          "name": "3.4 MacBook Pro 16 M3 Max",
           "request": {
             "method": "POST",
             "header": [
@@ -250,33 +209,26 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": 4,\n  \"name\": \"Apple MacBook Pro 16 M3 Max\",\n  \"description\": \"Laptop profesional de alto rendimiento con chip Apple M3 Max, 12 cores CPU, 18 core GPU, pantalla Liquid Retina XDR de 16 pulgadas, 32GB RAM unified memory, 512GB SSD, batería de 140W hasta 22 horas, puertos Thunderbolt 4\",\n  \"category\": \"Electrónica/Computadoras/Laptops Premium\",\n  \"price\": 3499.00,\n  \"discountPercentage\": 5,\n  \"discountedPrice\": 3323.95,\n  \"installmentMonths\": 24,\n  \"color\": \"Espacio Gris\",\n  \"size\": \"16 pulgadas\",\n  \"material\": \"Aluminio de grado aeronáutico\",\n  \"brand\": \"Apple\",\n  \"model\": \"MacBook Pro 16 M3 Max\",\n  \"stock\": 12,\n  \"isAvailable\": true,\n  \"isNew\": true,\n  \"condition\": \"NEW\",\n  \"rating\": 4.9,\n  \"reviewCount\": 892,\n  \"vendorId\": 1,\n  \"vendorName\": \"Apple Premium Store Oficial\",\n  \"vendorRating\": 4.9,\n  \"vendorReviewCount\": 12500,\n  \"paymentMethods\": [\n    \"CREDIT_CARD\",\n    \"DEBIT_CARD\",\n    \"MERCADO_PAGO\",\n    \"BANK_TRANSFER\",\n    \"INSTALLMENT_PLAN\",\n    \"CRYPTO_PAYMENT\"\n  ],\n  \"imageUrls\": [\n    \"https://s3.amazonaws.com/meli-images/macbook-pro-16-1.jpg\",\n    \"https://s3.amazonaws.com/meli-images/macbook-pro-16-2.jpg\",\n    \"https://s3.amazonaws.com/meli-images/macbook-pro-16-3.jpg\",\n    \"https://s3.amazonaws.com/meli-images/macbook-pro-16-4.jpg\",\n    \"https://s3.amazonaws.com/meli-images/macbook-pro-16-5.jpg\"\n  ],\n  \"mainImageUrl\": \"https://s3.amazonaws.com/meli-images/macbook-pro-16-main.jpg\",\n  \"hasWarranty\": true,\n  \"warrantyInfo\": \"AppleCare+ de 3 años incluido, cobertura accidental\",\n  \"isFreeShipping\": true,\n  \"shippingCost\": 0,\n  \"estimatedShippingDays\": 1,\n  \"sku\": \"APPLE-MBP16-M3MAX-512-2026\",\n  \"status\": \"ACTIVE\"\n}"
+              "raw": "{\"id\":4,\"name\":\"Apple MacBook Pro 16 M3 Max\",\"description\":\"Laptop profesional con chip M3 Max, 12 cores CPU, 18 core GPU, pantalla Liquid Retina XDR 16 pulgadas\",\"category\":\"Electronica/Computadoras\",\"price\":3499.00,\"discountPercentage\":5,\"discountedPrice\":3323.95,\"installmentMonths\":24,\"color\":\"Espacio Gris\",\"size\":\"16 pulgadas\",\"material\":\"Aluminio de grado aeronautico\",\"brand\":\"Apple\",\"model\":\"MacBook Pro 16 M3 Max\",\"stock\":12,\"isAvailable\":true,\"isNew\":true,\"condition\":\"NEW\",\"rating\":4.9,\"reviewCount\":892,\"vendorId\":1,\"vendorName\":\"Apple Premium Store\",\"vendorRating\":4.9,\"vendorReviewCount\":12500,\"paymentMethods\":[\"CREDIT_CARD\",\"DEBIT_CARD\",\"MERCADO_PAGO\",\"BANK_TRANSFER\"],\"imageUrls\":[\"https://s3.amazonaws.com/images/macbook-1.jpg\",\"https://s3.amazonaws.com/images/macbook-2.jpg\"],\"mainImageUrl\":\"https://s3.amazonaws.com/images/macbook-main.jpg\",\"hasWarranty\":true,\"warrantyInfo\":\"AppleCare+ 3 anos\",\"isFreeShipping\":true,\"shippingCost\":0,\"estimatedShippingDays\":1,\"sku\":\"APPLE-MBP16-M3MAX\",\"status\":\"ACTIVE\"}"
             },
             "url": {
               "raw": "{{base_url}}/api/v1/models",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "8080",
-              "path": [
-                "api",
-                "v1",
-                "models"
-              ]
-            },
-            "description": "Crea producto MacBook Pro de precio alto con múltiples métodos de pago y muchas imágenes"
+              "path": ["api", "v1", "models"]
+            }
           },
           "response": []
         }
       ]
     },
     {
-      "name": "4️⃣ LISTAR PRODUCTOS (GET /models)",
-      "description": "Recuperar lista de todos los productos",
+      "name": "LISTAR PRODUCTOS",
+      "description": "Obtener lista de productos",
       "item": [
         {
-          "name": "4.1 Listar todos los productos",
+          "name": "4.1 GET /models - Listar todos",
           "request": {
             "method": "GET",
             "header": [
@@ -288,28 +240,21 @@
             "url": {
               "raw": "{{base_url}}/api/v1/models",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "8080",
-              "path": [
-                "api",
-                "v1",
-                "models"
-              ]
-            },
-            "description": "Obtiene lista de TODOS los productos con información resumida\n\n**Método:** GET\n**Requiere:** Bearer Token\n**Response:** 200 OK + Array de productos"
+              "path": ["api", "v1", "models"]
+            }
           },
           "response": []
         }
       ]
     },
     {
-      "name": "5️⃣ OBTENER DETALLES (GET /models/details)",
-      "description": "Recuperar detalles completos de un producto específico",
+      "name": "OBTENER DETALLES",
+      "description": "Obtener detalles completos de producto",
       "item": [
         {
-          "name": "5.1 Obtener detalles producto ID 1",
+          "name": "5.1 GET /models/details - ID 1",
           "request": {
             "method": "GET",
             "header": [
@@ -324,16 +269,381 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": 1\n}"
+              "raw": "{\"id\":1}"
             },
             "url": {
               "raw": "{{base_url}}/api/v1/models/details",
               "protocol": "http",
-              "host": [
-                "localhost"
-              ],
+              "host": ["localhost"],
               "port": "8080",
-              "path": [
-                "api",
-                "v1",
-                "models",\n                \"details\"\n              ]\n            },\n            \"description\": \"Obtiene detalles COMPLETOS de un producto incluyendo:\\n  - Todos los 40+ campos\\n  - Arrays completos (paymentMethods, imageUrls)\\n  - Metadata (createdAt, updatedAt, publishedAt)\\n\\n**Método:** GET (body)\\n**Requiere:** Bearer Token\\n**Response:** 200 OK + Producto completo\"\n          },\n          \"response\": []\n        },\n        {\n          \"name\": \"5.2 Obtener detalles producto ID 2\",\n          \"request\": {\n            \"method\": \"GET\",\n            \"header\": [\n              {\n                \"key\": \"Authorization\",\n                \"value\": \"Bearer {{token}}\"\n              },\n              {\n                \"key\": \"Content-Type\",\n                \"value\": \"application/json\"\n              }\n            ],\n            \"body\": {\n              \"mode\": \"raw\",\n              \"raw\": \"{\\n  \\\"id\\\": 2\\n}\"\n            },\n            \"url\": {\n              \"raw\": \"{{base_url}}/api/v1/models/details\",\n              \"protocol\": \"http\",\n              \"host\": [\n                \"localhost\"\n              ],\n              \"port\": \"8080\",\n              \"path\": [\n                \"api\",\n                \"v1\",\n                \"models\",\n                \"details\"\n              ]\n            },\n            \"description\": \"Obtiene detalles completos del producto Samsung Galaxy S24 Ultra\"\n          },\n          \"response\": []\n        }\n      ]\n    },\n    {\n      \"name\": \"6️⃣ ACTUALIZAR PRODUCTOS (PUT /models)\",\n      \"description\": \"Actualizar información de productos existentes\",\n      \"item\": [\n        {\n          \"name\": \"6.1 Actualizar precio y stock iPhone\",\n          \"request\": {\n            \"method\": \"PUT\",\n            \"header\": [\n              {\n                \"key\": \"Authorization\",\n                \"value\": \"Bearer {{token}}\"\n              },\n              {\n                \"key\": \"Content-Type\",\n                \"value\": \"application/json\"\n              }\n            ],\n            \"body\": {\n              \"mode\": \"raw\",\n              \"raw\": \"{\\n  \\\"id\\\": 1,\\n  \\\"name\\\": \\\"iPhone 15 Pro Max\\\",\\n  \\\"price\\\": 1149.99,\\n  \\\"discountPercentage\\\": 20,\\n  \\\"discountedPrice\\\": 919.99,\\n  \\\"stock\\\": 35\\n}\"\n            },\n            \"url\": {\n              \"raw\": \"{{base_url}}/api/v1/models\",\n              \"protocol\": \"http\",\n              \"host\": [\n                \"localhost\"\n              ],\n              \"port\": \"8080\",\n              \"path\": [\n                \"api\",\n                \"v1\",\n                \"models\"\n              ]\n            },\n            \"description\": \"Actualiza precio, descuento y stock del iPhone 15 Pro Max\\n\\n**Método:** PUT\\n**Requiere:** Bearer Token + ID válido\\n**Response:** 200 OK + Producto actualizado\"\n          },\n          \"response\": []\n        }\n      ]\n    },\n    {\n      \"name\": \"7️⃣ ELIMINAR PRODUCTOS (DELETE /models)\",\n      \"description\": \"Eliminar productos específicos\",\n      \"item\": [\n        {\n          \"name\": \"7.1 Eliminar producto ID 3 (Sony)\",\n          \"request\": {\n            \"method\": \"DELETE\",\n            \"header\": [\n              {\n                \"key\": \"Authorization\",\n                \"value\": \"Bearer {{token}}\"\n              },\n              {\n                \"key\": \"Content-Type\",\n                \"value\": \"application/json\"\n              }\n            ],\n            \"body\": {\n              \"mode\": \"raw\",\n              \"raw\": \"{\\n  \\\"id\\\": 3\\n}\"\n            },\n            \"url\": {\n              \"raw\": \"{{base_url}}/api/v1/models\",\n              \"protocol\": \"http\",\n              \"host\": [\n                \"localhost\"\n              ],\n              \"port\": \"8080\",\n              \"path\": [\n                \"api\",\n                \"v1\",\n                \"models\"\n              ]\n            },\n            \"description\": \"Elimina un producto específico\\n\\n**Método:** DELETE\\n**Requiere:** Bearer Token + ID válido\\n**Response:** 204 No Content (éxito) o 404 si no existe\"\n          },\n          \"response\": []\n        },\n        {\n          \"name\": \"7.2 Eliminar producto ID inexistente (Error 404)\",\n          \"request\": {\n            \"method\": \"DELETE\",\n            \"header\": [\n              {\n                \"key\": \"Authorization\",\n                \"value\": \"Bearer {{token}}\"\n              },\n              {\n                \"key\": \"Content-Type\",\n                \"value\": \"application/json\"\n              }\n            ],\n            \"body\": {\n              \"mode\": \"raw\",\n              \"raw\": \"{\\n  \\\"id\\\": 9999\\n}\"\n            },\n            \"url\": {\n              \"raw\": \"{{base_url}}/api/v1/models\",\n              \"protocol\": \"http\",\n              \"host\": [\n                \"localhost\"\n              ],\n              \"port\": \"8080\",\n              \"path\": [\n                \"api\",\n                \"v1\",\n                \"models\"\n              ]\n            },\n            \"description\": \"Intenta eliminar producto que no existe - debe retornar 404 Not Found\"\n          },\n          \"response\": []\n        }\n      ]\n    },\n    {\n      \"name\": \"📝 FLUJO COMPLETO DE PRUEBA\",\n      \"description\": \"Orden recomendado para probar todo el sistema\",\n      \"item\": [\n        {\n          \"name\": \"1. LOGIN - Obtener token\",\n          \"request\": {\n            \"method\": \"POST\",\n            \"header\": [\n              {\n                \"key\": \"Content-Type\",\n                \"value\": \"application/json\"\n              }\n            ],\n            \"body\": {\n              \"mode\": \"raw\",\n              \"raw\": \"{\\n  \\\"username\\\": \\\"testuser\\\",\\n  \\\"password\\\": \\\"password123\\\"\\n}\"\n            },\n            \"url\": {\n              \"raw\": \"{{base_url}}/auth/login\",\n              \"protocol\": \"http\",\n              \"host\": [\n                \"localhost\"\n              ],\n              \"port\": \"8080\",\n              \"path\": [\n                \"auth\",\n                \"login\"\n              ]\n            },\n            \"description\": \"**PASO 1:** Obtener JWT token\\n\\n⚠️ **IMPORTANTE:** Copiar el token del response y guardarlo en la variable `token` para las siguientes peticiones\"\n          },\n          \"response\": []\n        },\n        {\n          \"name\": \"2. LIMPIAR BD - DELETE /erase\",\n          \"request\": {\n            \"method\": \"DELETE\",\n            \"header\": [\n              {\n                \"key\": \"Authorization\",\n                \"value\": \"Bearer {{token}}\"\n              },\n              {\n                \"key\": \"Content-Type\",\n                \"value\": \"application/json\"\n              }\n            ],\n            \"body\": {\n              \"mode\": \"raw\",\n              \"raw\": \"{}\"\n            },\n            \"url\": {\n              \"raw\": \"{{base_url}}/api/v1/models/erase\",\n              \"protocol\": \"http\",\n              \"host\": [\n                \"localhost\"\n              ],\n              \"port\": \"8080\",\n              \"path\": [\n                \"api\",\n                \"v1\",\n                \"models\",\n                \"erase\"\n              ]\n            },\n            \"description\": \"**PASO 2:** Limpiar la base de datos (eliminar todos los productos)\"\n          },\n          \"response\": []\n        },\n        {\n          \"name\": \"3. CREAR iPhone (POST /models)\",\n          \"request\": {\n            \"method\": \"POST\",\n            \"header\": [\n              {\n                \"key\": \"Authorization\",\n                \"value\": \"Bearer {{token}}\"\n              },\n              {\n                \"key\": \"Content-Type\",\n                \"value\": \"application/json\"\n              }\n            ],\n            \"body\": {\n              \"mode\": \"raw\",\n              \"raw\": \"{\\n  \\\"id\\\": 1,\\n  \\\"name\\\": \\\"iPhone 15 Pro Max\\\",\\n  \\\"description\\\": \\\"Premium smartphone con cámara de 48MP, pantalla Dynamic Island de 6.7 pulgadas con ProMotion 120Hz, procesador A17 Pro, batería de 4685mAh con carga rápida de 45W, resistencia IP68, y diseño premium de titanio quirúrgico\\\",\\n  \\\"category\\\": \\\"Electrónica/Celulares/Smartphones Premium\\\",\\n  \\\"price\\\": 1199.99,\\n  \\\"discountPercentage\\\": 10,\\n  \\\"discountedPrice\\\": 1079.99,\\n  \\\"installmentMonths\\\": 12,\\n  \\\"color\\\": \\\"Titanio Negro\\\",\\n  \\\"size\\\": \\\"6.7 pulgadas\\\",\\n  \\\"material\\\": \\\"Titanio quirúrgico, Ceramic Shield, Corning Gorilla Glass\\\",\\n  \\\"brand\\\": \\\"Apple\\\",\\n  \\\"model\\\": \\\"iPhone 15 Pro Max\\\",\\n  \\\"stock\\\": 45,\\n  \\\"isAvailable\\\": true,\\n  \\\"isNew\\\": true,\\n  \\\"condition\\\": \\\"NEW\\\",\\n  \\\"rating\\\": 4.8,\\n  \\\"reviewCount\\\": 2450,\\n  \\\"vendorId\\\": 1,\\n  \\\"vendorName\\\": \\\"Apple Premium Store Oficial\\\",\\n  \\\"vendorRating\\\": 4.9,\\n  \\\"vendorReviewCount\\\": 12500,\\n  \\\"paymentMethods\\\": [\\n    \\\"CREDIT_CARD\\\",\\n    \\\"DEBIT_CARD\\\",\\n    \\\"MERCADO_PAGO\\\",\\n    \\\"CRYPTO_PAYMENT\\\",\\n    \\\"INSTALLMENT_PLAN\\\"\\n  ],\\n  \\\"imageUrls\\\": [\\n    \\\"https://s3.amazonaws.com/meli-images/iphone15-pro-max-1.jpg\\\",\\n    \\\"https://s3.amazonaws.com/meli-images/iphone15-pro-max-2.jpg\\\",\\n    \\\"https://s3.amazonaws.com/meli-images/iphone15-pro-max-3.jpg\\\",\\n    \\\"https://s3.amazonaws.com/meli-images/iphone15-pro-max-4.jpg\\\"\\n  ],\\n  \\\"mainImageUrl\\\": \\\"https://s3.amazonaws.com/meli-images/iphone15-pro-max-main.jpg\\\",\\n  \\\"hasWarranty\\\": true,\\n  \\\"warrantyInfo\\\": \\\"Garantía internacional de 2 años + AppleCare+ disponible\\\",\\n  \\\"isFreeShipping\\\": true,\\n  \\\"shippingCost\\\": 0,\\n  \\\"estimatedShippingDays\\\": 2,\\n  \\\"sku\\\": \\\"APPLE-IP15PM-TI-256GB-2026\\\",\\n  \\\"status\\\": \\\"ACTIVE\\\"\\n}\"\n            },\n            \"url\": {\n              \"raw\": \"{{base_url}}/api/v1/models\",\n              \"protocol\": \"http\",\n              \"host\": [\n                \"localhost\"\n              ],\n              \"port\": \"8080\",\n              \"path\": [\n                \"api\",\n                \"v1\",\n                \"models\"\n              ]\n            },\n            \"description\": \"**PASO 3:** Crear primer producto con TODOS los 40+ campos\"\n          },\n          \"response\": []\n        },\n        {\n          \"name\": \"4. CREAR Samsung (POST /models)\",\n          \"request\": {\n            \"method\": \"POST\",\n            \"header\": [\n              {\n                \"key\": \"Authorization\",\n                \"value\": \"Bearer {{token}}\"\n              },\n              {\n                \"key\": \"Content-Type\",\n                \"value\": \"application/json\"\n              }\n            ],\n            \"body\": {\n              \"mode\": \"raw\",\n              \"raw\": \"{\\n  \\\"id\\\": 2,\\n  \\\"name\\\": \\\"Samsung Galaxy S24 Ultra\\\",\\n  \\\"description\\\": \\\"Smartphone flagship con pantalla Dynamic AMOLED 2X de 6.8 pulgadas, procesador Snapdragon 8 Gen 3 Leading Version, cámara triple 200MP con zoom 10x óptico, batería 5000mAh con carga rápida 45W, IP68 water resistant\\\",\\n  \\\"category\\\": \\\"Electrónica/Celulares/Smartphones Premium\\\",\\n  \\\"price\\\": 1299.99,\\n  \\\"discountPercentage\\\": 15,\\n  \\\"discountedPrice\\\": 1104.99,\\n  \\\"installmentMonths\\\": 18,\\n  \\\"color\\\": \\\"Titanio Gris\\\",\\n  \\\"size\\\": \\\"6.8 pulgadas\\\",\\n  \\\"material\\\": \\\"Gorilla Glass Armor, Marco Titanio\\\",\\n  \\\"brand\\\": \\\"Samsung\\\",\\n  \\\"model\\\": \\\"Galaxy S24 Ultra\\\",\\n  \\\"stock\\\": 32,\\n  \\\"isAvailable\\\": true,\\n  \\\"isNew\\\": true,\\n  \\\"condition\\\": \\\"NEW\\\",\\n  \\\"rating\\\": 4.7,\\n  \\\"reviewCount\\\": 1890,\\n  \\\"vendorId\\\": 2,\\n  \\\"vendorName\\\": \\\"Samsung Experience Store\\\",\\n  \\\"vendorRating\\\": 4.8,\\n  \\\"vendorReviewCount\\\": 8900,\\n  \\\"paymentMethods\\\": [\\n    \\\"CREDIT_CARD\\\",\\n    \\\"DEBIT_CARD\\\",\\n    \\\"MERCADO_PAGO\\\",\\n    \\\"BANK_TRANSFER\\\",\\n    \\\"INSTALLMENT_PLAN\\\"\\n  ],\\n  \\\"imageUrls\\\": [\\n    \\\"https://s3.amazonaws.com/meli-images/samsung-s24-ultra-1.jpg\\\",\\n    \\\"https://s3.amazonaws.com/meli-images/samsung-s24-ultra-2.jpg\\\",\\n    \\\"https://s3.amazonaws.com/meli-images/samsung-s24-ultra-3.jpg\\\"\\n  ],\\n  \\\"mainImageUrl\\\": \\\"https://s3.amazonaws.com/meli-images/samsung-s24-ultra-main.jpg\\\",\\n  \\\"hasWarranty\\\": true,\\n  \\\"warrantyInfo\\\": \\\"Garantía oficial Samsung 2 años\\\",\\n  \\\"isFreeShipping\\\": true,\\n  \\\"shippingCost\\\": 0,\\n  \\\"estimatedShippingDays\\\": 3,\\n  \\\"sku\\\": \\\"SAMSUNG-S24U-256GB-TI-2026\\\",\\n  \\\"status\\\": \\\"ACTIVE\\\"\\n}\"\n            },\n            \"url\": {\n              \"raw\": \"{{base_url}}/api/v1/models\",\n              \"protocol\": \"http\",\n              \"host\": [\n                \"localhost\"\n              ],\n              \"port\": \"8080\",\n              \"path\": [\n                \"api\",\n                \"v1\",\n                \"models\"\n              ]\n            },\n            \"description\": \"**PASO 4:** Crear segundo producto\"\n          },\n          \"response\": []\n        },\n        {\n          \"name\": \"5. LISTAR todos los productos (GET)\",\n          \"request\": {\n            \"method\": \"GET\",\n            \"header\": [\n              {\n                \"key\": \"Authorization\",\n                \"value\": \"Bearer {{token}}\"\n              }\n            ],\n            \"url\": {\n              \"raw\": \"{{base_url}}/api/v1/models\",\n              \"protocol\": \"http\",\n              \"host\": [\n                \"localhost\"\n              ],\n              \"port\": \"8080\",\n              \"path\": [\n                \"api\",\n                \"v1\",\n                \"models\"\n              ]\n            },\n            \"description\": \"**PASO 5:** Listar todos los productos creados\"\n          },\n          \"response\": []\n        },\n        {\n          \"name\": \"6. OBTENER detalles producto ID 1\",\n          \"request\": {\n            \"method\": \"GET\",\n            \"header\": [\n              {\n                \"key\": \"Authorization\",\n                \"value\": \"Bearer {{token}}\"\n              },\n              {\n                \"key\": \"Content-Type\",\n                \"value\": \"application/json\"\n              }\n            ],\n            \"body\": {\n              \"mode\": \"raw\",\n              \"raw\": \"{\\n  \\\"id\\\": 1\\n}\"\n            },\n            \"url\": {\n              \"raw\": \"{{base_url}}/api/v1/models/details\",\n              \"protocol\": \"http\",\n              \"host\": [\n                \"localhost\"\n              ],\n              \"port\": \"8080\",\n              \"path\": [\n                \"api\",\n                \"v1\",\n                \"models\",\n                \"details\"\n              ]\n            },\n            \"description\": \"**PASO 6:** Obtener detalles COMPLETOS del iPhone incluyendo:\\n- Todos los 40+ campos\\n- Arrays (paymentMethods, imageUrls) completos\\n- Metadata (createdAt, updatedAt)\"\n          },\n          \"response\": []\n        },\n        {\n          \"name\": \"7. ACTUALIZAR precio/stock\",\n          \"request\": {\n            \"method\": \"PUT\",\n            \"header\": [\n              {\n                \"key\": \"Authorization\",\n                \"value\": \"Bearer {{token}}\"\n              },\n              {\n                \"key\": \"Content-Type\",\n                \"value\": \"application/json\"\n              }\n            ],\n            \"body\": {\n              \"mode\": \"raw\",\n              \"raw\": \"{\\n  \\\"id\\\": 1,\\n  \\\"name\\\": \\\"iPhone 15 Pro Max\\\",\\n  \\\"price\\\": 1099.99,\\n  \\\"stock\\\": 30\\n}\"\n            },\n            \"url\": {\n              \"raw\": \"{{base_url}}/api/v1/models\",\n              \"protocol\": \"http\",\n              \"host\": [\n                \"localhost\"\n              ],\n              \"port\": \"8080\",\n              \"path\": [\n                \"api\",\n                \"v1\",\n                \"models\"\n              ]\n            },\n            \"description\": \"**PASO 7:** Actualizar precio y stock del iPhone\"\n          },\n          \"response\": []\n        },\n        {\n          \"name\": \"8. ELIMINAR producto ID 2\",\n          \"request\": {\n            \"method\": \"DELETE\",\n            \"header\": [\n              {\n                \"key\": \"Authorization\",\n                \"value\": \"Bearer {{token}}\"\n              },\n              {\n                \"key\": \"Content-Type\",\n                \"value\": \"application/json\"\n              }\n            ],\n            \"body\": {\n              \"mode\": \"raw\",\n              \"raw\": \"{\\n  \\\"id\\\": 2\\n}\"\n            },\n            \"url\": {\n              \"raw\": \"{{base_url}}/api/v1/models\",\n              \"protocol\": \"http\",\n              \"host\": [\n                \"localhost\"\n              ],\n              \"port\": \"8080\",\n              \"path\": [\n                \"api\",\n                \"v1\",\n                \"models\"\n              ]\n            },\n            \"description\": \"**PASO 8:** Eliminar el producto Samsung\"\n          },\n          \"response\": []\n        },\n        {\n          \"name\": \"9. LISTAR finales (verificar solo 1 producto)\",\n          \"request\": {\n            \"method\": \"GET\",\n            \"header\": [\n              {\n                \"key\": \"Authorization\",\n                \"value\": \"Bearer {{token}}\"\n              }\n            ],\n            \"url\": {\n              \"raw\": \"{{base_url}}/api/v1/models\",\n              \"protocol\": \"http\",\n              \"host\": [\n                \"localhost\"\n              ],\n              \"port\": \"8080\",\n              \"path\": [\n                \"api\",\n                \"v1\",\n                \"models\"\n              ]\n            },\n            \"description\": \"**PASO 9:** Verificar que solo queda el iPhone (Samsung fue eliminado)\"\n          },\n          \"response\": []\n        }\n      ]\n    }\n  ]\n}\n
+              "path": ["api", "v1", "models", "details"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5.2 GET /models/details - ID 2",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id\":2}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models/details",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "models", "details"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "ACTUALIZAR PRODUCTO",
+      "description": "Actualizar informacion de producto",
+      "item": [
+        {
+          "name": "6.1 PUT /models - Actualizar precio",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id\":1,\"name\":\"iPhone 15 Pro Max\",\"price\":1099.99,\"discountPercentage\":20,\"stock\":30}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "models"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "ELIMINAR PRODUCTO",
+      "description": "Eliminar productos",
+      "item": [
+        {
+          "name": "7.1 DELETE /models - Eliminar ID 2",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id\":2}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "models"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "7.2 DELETE /models - Error 404",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id\":9999}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "models"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "FLUJO COMPLETO",
+      "description": "Orden para probar todo el sistema",
+      "item": [
+        {
+          "name": "PASO 1 - Login testuser",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"testuser\",\"password\":\"password123\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PASO 2 - Limpiar BD",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models/erase",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "models", "erase"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PASO 3 - Crear iPhone",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id\":1,\"name\":\"iPhone 15 Pro Max\",\"description\":\"Premium smartphone\",\"category\":\"Electronica/Celulares\",\"price\":1199.99,\"discountPercentage\":10,\"discountedPrice\":1079.99,\"installmentMonths\":12,\"color\":\"Titanio Negro\",\"size\":\"6.7 pulgadas\",\"material\":\"Titanio\",\"brand\":\"Apple\",\"model\":\"iPhone 15 Pro Max\",\"stock\":45,\"isAvailable\":true,\"isNew\":true,\"condition\":\"NEW\",\"rating\":4.8,\"reviewCount\":2450,\"vendorId\":1,\"vendorName\":\"Apple Store\",\"vendorRating\":4.9,\"vendorReviewCount\":12500,\"paymentMethods\":[\"CREDIT_CARD\",\"MERCADO_PAGO\"],\"imageUrls\":[\"https://s3.amazonaws.com/images/iphone15.jpg\"],\"mainImageUrl\":\"https://s3.amazonaws.com/images/iphone15-main.jpg\",\"hasWarranty\":true,\"warrantyInfo\":\"2 anos\",\"isFreeShipping\":true,\"shippingCost\":0,\"estimatedShippingDays\":2,\"sku\":\"APPLE-IP15PM\",\"status\":\"ACTIVE\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "models"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PASO 4 - Crear Samsung",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id\":2,\"name\":\"Samsung Galaxy S24 Ultra\",\"description\":\"Smartphone flagship\",\"category\":\"Electronica/Celulares\",\"price\":1299.99,\"discountPercentage\":15,\"discountedPrice\":1104.99,\"installmentMonths\":18,\"color\":\"Titanio Gris\",\"size\":\"6.8 pulgadas\",\"material\":\"Gorilla Glass\",\"brand\":\"Samsung\",\"model\":\"Galaxy S24 Ultra\",\"stock\":32,\"isAvailable\":true,\"isNew\":true,\"condition\":\"NEW\",\"rating\":4.7,\"reviewCount\":1890,\"vendorId\":2,\"vendorName\":\"Samsung Store\",\"vendorRating\":4.8,\"vendorReviewCount\":8900,\"paymentMethods\":[\"CREDIT_CARD\",\"MERCADO_PAGO\"],\"imageUrls\":[\"https://s3.amazonaws.com/images/samsung.jpg\"],\"mainImageUrl\":\"https://s3.amazonaws.com/images/samsung-main.jpg\",\"hasWarranty\":true,\"warrantyInfo\":\"2 anos\",\"isFreeShipping\":true,\"shippingCost\":0,\"estimatedShippingDays\":3,\"sku\":\"SAMSUNG-S24U\",\"status\":\"ACTIVE\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "models"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PASO 5 - Listar todos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "models"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PASO 6 - Detalles iPhone",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id\":1}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models/details",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "models", "details"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PASO 7 - Actualizar precio",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id\":1,\"name\":\"iPhone 15 Pro Max\",\"price\":1099.99,\"stock\":30}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "models"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PASO 8 - Eliminar Samsung",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id\":2}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "models"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PASO 9 - Listar finales",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "models"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
