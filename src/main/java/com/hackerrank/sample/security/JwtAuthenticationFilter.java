@@ -33,14 +33,34 @@ public class JwtAuthenticationFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         
-        // Permitir endpoints públicos sin autenticación
+        // Rutas públicas que no requieren autenticación
         String requestPath = httpRequest.getRequestURI();
-        if (requestPath.startsWith("/auth/") || requestPath.equals("/")) {
+        
+        // OpenAPI / Swagger UI
+        if (requestPath.startsWith("/swagger-ui") || 
+            requestPath.startsWith("/swagger-ui.html") ||
+            requestPath.startsWith("/v3/api-docs") ||
+            requestPath.startsWith("/swagger-resources") ||
+            requestPath.equals("/api/v1/") ||
+            requestPath.equals("/")) {
             chain.doFilter(request, response);
             return;
         }
         
-        // Obtener token del header Authorization
+        // Autenticación (login)
+        if (requestPath.startsWith("/auth/") || requestPath.startsWith("/api/v1/auth/")) {
+            chain.doFilter(request, response);
+            return;
+        }
+        
+        // Health checks y métricas públicas
+        if (requestPath.startsWith("/api/v1/actuator/health") || 
+            requestPath.startsWith("/api/v1/actuator/info")) {
+            chain.doFilter(request, response);
+            return;
+        }
+        
+        // Obtener token del header Authorization para rutas protegidas
         String authHeader = httpRequest.getHeader("Authorization");
         
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {

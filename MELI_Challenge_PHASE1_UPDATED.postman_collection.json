@@ -1,0 +1,317 @@
+{
+  "info": {
+    "name": "MELI Challenge - Phase 1 (Essentials)",
+    "description": "Colección actualizada con valores de validación correctos - Fase 1 con OpenAPI, Health Checks y Validación completa",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string",
+      "description": "URL base de la API (cambiar si usas diferente puerto)"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string",
+      "description": "JWT Token obtenido del login"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. AUTENTICACION",
+      "description": "Endpoints de autenticación JWT - Obtén el token para acceder a endpoints protegidos",
+      "item": [
+        {
+          "name": "1.1 Login - testuser",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set(\"token\", jsonData.token);",
+                  "    console.log('Token guardado: ' + jsonData.token.substring(0, 20) + '...');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Login con usuario de prueba\n\n**Credenciales:**\n- Username: testuser\n- Password: password123\n\nRetorna JWT token que se usar en otras peticiones"
+          },
+          "response": []
+        },
+        {
+          "name": "1.2 Login - admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set(\"token\", jsonData.token);",
+                  "    console.log('Token guardado: ' + jsonData.token.substring(0, 20) + '...');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Login con usuario admin\n\n**Credenciales:**\n- Username: admin\n- Password: admin123"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. DOCUMENTACION & SALUD",
+      "description": "Acceso a documentación y estado de la aplicación",
+      "item": [
+        {
+          "name": "2.1 Swagger UI",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/swagger-ui.html",
+              "host": ["{{base_url}}"],
+              "path": ["swagger-ui.html"]
+            },
+            "description": "Interfaz Swagger para explorar la API\n\nAbrir en navegador para ver documentación interactiva"
+          },
+          "response": []
+        },
+        {
+          "name": "2.2 OpenAPI JSON",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v3/api-docs",
+              "host": ["{{base_url}}"],
+              "path": ["v3", "api-docs"]
+            },
+            "description": "Especificación completa en formato OpenAPI 3.0 JSON"
+          },
+          "response": []
+        },
+        {
+          "name": "2.3 Health Check - Completo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/actuator/health",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "actuator", "health"]
+            },
+            "description": "Estado completo de la aplicación\n\nMuestra:\n- Estado general (UP/DOWN)\n- Estado de BD (H2)\n- Estado de disco\n- Liveness probe (¿está corriendo?)\n- Readiness probe (¿está listo para tráfico?)"
+          },
+          "response": []
+        },
+        {
+          "name": "2.4 Health Liveness",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/actuator/health/liveness",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "actuator", "health", "liveness"]
+            },
+            "description": "¿El servicio está activo?\n\nUsado por Kubernetes para reiniciar contenedores si falla"
+          },
+          "response": []
+        },
+        {
+          "name": "2.5 Health Readiness",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/actuator/health/readiness",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "actuator", "health", "readiness"]
+            },
+            "description": "¿El servicio está listo para recibir tráfico?\n\nUsado por Kubernetes load balancer"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. CRUD BASICO",
+      "description": "Operaciones CRUD básicas con valores validados correctamente",
+      "item": [
+        {
+          "name": "3.1 Limpiar BD - DELETE /models/erase",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models/erase",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models", "erase"]
+            },
+            "description": "Elimina TODOS los productos de la base de datos"
+          },
+          "response": []
+        },
+        {
+          "name": "3.2 Crear - iPhone 15 Pro Max",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"name\": \"iPhone 15 Pro Max\",\n  \"description\": \"Premium smartphone con cámara de 48MP, pantalla Dynamic Island de 6.7 pulgadas, procesador A17 Pro\",\n  \"category\": \"Electrónica/Celulares\",\n  \"price\": 1199.99,\n  \"discountPercentage\": 10,\n  \"installmentMonths\": 12,\n  \"color\": \"Titanio Negro\",\n  \"size\": \"6.7 pulgadas\",\n  \"material\": \"Titanio quirúrgico\",\n  \"brand\": \"Apple\",\n  \"model\": \"iPhone 15 Pro Max\",\n  \"stock\": 45,\n  \"isAvailable\": true,\n  \"isNew\": true,\n  \"condition\": \"Nueva\",\n  \"rating\": 4.8,\n  \"reviewCount\": 2450,\n  \"vendorId\": 1,\n  \"vendorName\": \"Apple Premium Store\",\n  \"vendorRating\": 4.9,\n  \"vendorReviewCount\": 12500,\n  \"paymentMethods\": [\"CREDIT_CARD\", \"DEBIT_CARD\", \"MERCADO_PAGO\"],\n  \"imageUrls\": [\"https://s3.amazonaws.com/images/iphone15-1.jpg\", \"https://s3.amazonaws.com/images/iphone15-2.jpg\"],\n  \"mainImageUrl\": \"https://s3.amazonaws.com/images/iphone15-main.jpg\",\n  \"status\": \"ACTIVO\",\n  \"hasWarranty\": true,\n  \"warrantyInfo\": \"Garantía 2 años\",\n  \"isFreeShipping\": true,\n  \"shippingCost\": 0,\n  \"estimatedShippingDays\": 2,\n  \"sku\": \"APPLE-IP15PM-256GB\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models"]
+            },
+            "description": "Crear nuevo producto\n\n**Campos validados:**\n- `condition`: Nueva, Usado, Recondicionado (exactamente estos valores)\n- `status`: ACTIVO, INACTIVO, SUSPENDIDO (exactamente estos valores)\n- `price`: > 0\n- `stock`: >= 0\n- `rating`: 0-5\n- `name`: 3-255 caracteres\n- `description`: 10-2000 caracteres"
+          },
+          "response": []
+        },
+        {
+          "name": "3.3 Crear - Samsung Galaxy S24",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 2,\n  \"name\": \"Samsung Galaxy S24 Ultra\",\n  \"description\": \"Smartphone flagship con pantalla Dynamic AMOLED 2X de 6.8 pulgadas, procesador Snapdragon 8 Gen 3\",\n  \"category\": \"Electrónica/Celulares\",\n  \"price\": 1299.99,\n  \"discountPercentage\": 15,\n  \"installmentMonths\": 18,\n  \"color\": \"Titanio Gris\",\n  \"size\": \"6.8 pulgadas\",\n  \"material\": \"Gorilla Glass Armor\",\n  \"brand\": \"Samsung\",\n  \"model\": \"Galaxy S24 Ultra\",\n  \"stock\": 32,\n  \"isAvailable\": true,\n  \"isNew\": true,\n  \"condition\": \"Nueva\",\n  \"rating\": 4.7,\n  \"reviewCount\": 1890,\n  \"vendorId\": 2,\n  \"vendorName\": \"Samsung Experience Store\",\n  \"vendorRating\": 4.8,\n  \"vendorReviewCount\": 8900,\n  \"paymentMethods\": [\"CREDIT_CARD\", \"DEBIT_CARD\", \"MERCADO_PAGO\", \"BANK_TRANSFER\"],\n  \"imageUrls\": [\"https://s3.amazonaws.com/images/samsung-s24-1.jpg\", \"https://s3.amazonaws.com/images/samsung-s24-2.jpg\"],\n  \"mainImageUrl\": \"https://s3.amazonaws.com/images/samsung-s24-main.jpg\",\n  \"status\": \"ACTIVO\",\n  \"hasWarranty\": true,\n  \"warrantyInfo\": \"Garantía Samsung 2 años\",\n  \"isFreeShipping\": true,\n  \"shippingCost\": 0,\n  \"estimatedShippingDays\": 3,\n  \"sku\": \"SAMSUNG-S24U-256GB\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models"]
+            },
+            "description": "Crear segundo producto"
+          },
+          "response": []
+        },
+        {
+          "name": "3.4 Listar - GET /models",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models"]
+            },
+            "description": "Lista todos los productos"
+          },
+          "response": []
+        },
+        {
+          "name": "3.5 Obtener Detalles - GET /models/details (ID 1)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/models/details?id=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models", "details"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Obtiene detalles completos de un producto por ID"
+          },
+          "response": []
+        },
+        {
+          "name": "3.6 Actualizar - PUT /models",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },\n              {\n                \"key\": \"Content-Type\",\n                \"value\": \"application/json\"\n              }\n            ],\n            \"body\": {\n              \"mode\": \"raw\",\n              \"raw\": \"{\\n  \\\"id\\\": 1,\\n  \\\"price\\\": 899.99,\\n  \\\"stock\\\": 25,\\n  \\\"rating\\\": 4.9\\n}\"\n            },\n            \"url\": {\n              \"raw\": \"{{base_url}}/api/v1/models\",\n              \"host\": [\"{{base_url}}\"],\n              \"path\": [\"api\", \"v1\", \"models\"]\n            },\n            \"description\": \"Actualiza campos específicos de un producto\\n\\nSolo es necesario enviar los campos a actualizar (precio, stock, rating, etc.)\"\n          },\n          \"response\": []\n        },\n        {\n          \"name\": \"3.7 Eliminar - DELETE /models (ID 2)\",\n          \"request\": {\n            \"method\": \"DELETE\",\n            \"header\": [\n              {\n                \"key\": \"Authorization\",\n                \"value\": \"Bearer {{token}}\"\n              },\n              {\n                \"key\": \"Content-Type\",\n                \"value\": \"application/json\"\n              }\n            ],\n            \"body\": {\n              \"mode\": \"raw\",\n              \"raw\": \"{\\\"id\\\": 2}\"\n            },\n            \"url\": {\n              \"raw\": \"{{base_url}}/api/v1/models\",\n              \"host\": [\"{{base_url}}\"],\n              \"path\": [\"api\", \"v1\", \"models\"]\n            },\n            \"description\": \"Elimina un producto por ID\"\n          },\n          \"response\": []\n        }\n      ]\n    },\n    {\n      \"name\": \"4. VALIDACION & ERRORES\",\n      \"description\": \"Ejemplos de validación y manejo de errores\",\n      \"item\": [\n        {\n          \"name\": \"4.1 Error - Validation (condition inválida)\",\n          \"request\": {\n            \"method\": \"POST\",\n            \"header\": [\n              {\n                \"key\": \"Authorization\",\n                \"value\": \"Bearer {{token}}\"\n              },\n              {\n                \"key\": \"Content-Type\",\n                \"value\": \"application/json\"\n              }\n            ],\n            \"body\": {\n              \"mode\": \"raw\",\n              \"raw\": \"{\\n  \\\"id\\\": 99,\\n  \\\"name\\\": \\\"Test Product\\\",\\n  \\\"description\\\": \\\"Descripción del producto de prueba\\\",\\n  \\\"category\\\": \\\"Test\\\",\\n  \\\"price\\\": 100,\\n  \\\"brand\\\": \\\"Brand\\\",\\n  \\\"model\\\": \\\"Model\\\",\\n  \\\"condition\\\": \\\"INVALID_CONDITION\\\",\\n  \\\"status\\\": \\\"UNKNOWN\\\",\\n  \\\"stock\\\": 10,\\n  \\\"isAvailable\\\": true,\\n  \\\"isNew\\\": true,\\n  \\\"rating\\\": 5,\\n  \\\"reviewCount\\\": 0,\\n  \\\"vendorId\\\": 1,\\n  \\\"vendorName\\\": \\\"Vendor\\\",\\n  \\\"paymentMethods\\\": [\\\"CREDIT_CARD\\\"],\\n  \\\"imageUrls\\\": [\\\"http://example.com/image.jpg\\\"],\\n  \\\"mainImageUrl\\\": \\\"http://example.com/main.jpg\\\"\\n}\"\n            },\n            \"url\": {\n              \"raw\": \"{{base_url}}/api/v1/models\",\n              \"host\": [\"{{base_url}}\"],\n              \"path\": [\"api\", \"v1\", \"models\"]\n            },\n            \"description\": \"Intenta crear con condition y status inválidos\\n\\nLos valores válidos son:\\n- **condition**: Nueva, Usado, Recondicionado\\n- **status**: ACTIVO, INACTIVO, SUSPENDIDO\"\n          },\n          \"response\": []\n        },\n        {\n          \"name\": \"4.2 Error - Not Found (ID no existe)\",\n          \"request\": {\n            \"method\": \"GET\",\n            \"header\": [\n              {\n                \"key\": \"Authorization\",\n                \"value\": \"Bearer {{token}}\"\n              }\n            ],\n            \"url\": {\n              \"raw\": \"{{base_url}}/api/v1/models/details?id=9999\",\n              \"host\": [\"{{base_url}}\"],\n              \"path\": [\"api\", \"v1\", \"models\", \"details\"],\n              \"query\": [\n                {\n                  \"key\": \"id\",\n                  \"value\": \"9999\"\n                }\n              ]\n            },\n            \"description\": \"Intenta obtener un producto que no existe\\n\\nRetorna 404 Not Found\"\n          },\n          \"response\": []\n        }\n      ]\n    }\n  ]\n}\n
