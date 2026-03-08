@@ -18,9 +18,16 @@ buildNumber.properties
 # Logs
 logs
 *.log
+*.log.*.gz
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Build artifacts
+build_log.txt
+
+# Temp / test notes
+TEST_AUTH.txt
 
 # Runtime data
 pids

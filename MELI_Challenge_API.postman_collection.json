@@ -1,0 +1,1198 @@
+{
+  "info": {
+    "name": "MercadoLibre Item Detail API",
+    "description": "# MercadoLibre Item Detail API\n\n## Descripción\nColección completa para explorar todos los endpoints de la API de detalle de ítems inspirada en MercadoLibre.\n\n## Setup rápido\n1. Importar esta colección en Postman\n2. Ejecutar **'[SETUP] Login automático'** para obtener token JWT\n3. El token se guarda automáticamente en la variable `{{token}}`\n4. Todos los demás requests ya usan `{{token}}` — no necesitas copiarlo manualmente\n\n## Variables de colección\n- `base_url`: http://localhost:8080\n- `token`: se llena automáticamente al hacer login\n\n## Flujo recomendado\n1. SETUP → Login\n2. OBSERVABILIDAD → Health check\n3. MODELOS → Limpiar BD\n4. MODELOS → Crear 3-4 ítems\n5. MODELOS → Listar y buscar\n6. MODELOS → Actualizar\n7. MODELOS → Eliminar\n\n## Servidor\n`http://localhost:8080` — asegúrate de que la aplicación esté corriendo con `mvn spring-boot:run`",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "description": "URL base de la aplicación. Cambiar si el puerto es diferente."
+    },
+    {
+      "key": "token",
+      "value": "",
+      "description": "Token JWT. Se llena automáticamente al ejecutar el request de login."
+    }
+  ],
+  "item": [
+
+    {
+      "name": "0. SETUP — Autenticación",
+      "description": "## Autenticación JWT\n\nTodos los endpoints de modelos requieren un token JWT en el header:\n```\nAuthorization: Bearer {{token}}\n```\n\nEjecuta primero cualquiera de los logins. El token se guarda en `{{token}}` automáticamente mediante el script del test.\n\n**Usuarios preconfigurados:**\n| Usuario | Contraseña | Rol |\n|---|---|---|\n| testuser | password123 | USER |\n| admin | admin123 | ADMIN |\n\nEl token expira en **1 hora**.",
+      "item": [
+        {
+          "name": "[LOGIN] testuser — guarda token automáticamente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Captura el token de la respuesta y lo guarda en la variable de colección",
+                  "const json = pm.response.json();",
+                  "if (json.token) {",
+                  "    pm.collectionVariables.set('token', json.token);",
+                  "    console.log('✅ Token guardado para: ' + json.username);",
+                  "    pm.test('Login exitoso', () => pm.response.to.have.status(200));",
+                  "    pm.test('Token presente', () => pm.expect(json.token).to.be.a('string').and.not.empty);",
+                  "    pm.test('tokenType es Bearer', () => pm.expect(json.tokenType).to.eql('Bearer'));",
+                  "} else {",
+                  "    console.error('❌ Login fallido:', JSON.stringify(json));",
+                  "    pm.test('Login fallido - revisar credenciales', () => pm.response.to.have.status(200));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"password123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Autentica con usuario testuser y guarda el JWT automáticamente en `{{token}}`.\n\n**Respuesta exitosa (200):**\n```json\n{\n  \"success\": true,\n  \"token\": \"eyJhbGci...\",\n  \"username\": \"testuser\",\n  \"role\": \"USER\",\n  \"tokenType\": \"Bearer\",\n  \"expiresIn\": \"1 hora\"\n}\n```"
+          },
+          "response": []
+        },
+        {
+          "name": "[LOGIN] admin — guarda token automáticamente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.token) {",
+                  "    pm.collectionVariables.set('token', json.token);",
+                  "    console.log('✅ Token admin guardado');",
+                  "    pm.test('Login admin exitoso', () => pm.response.to.have.status(200));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Autentica con usuario admin y guarda el JWT en `{{token}}`."
+          },
+          "response": []
+        },
+        {
+          "name": "[LOGIN] Credenciales incorrectas → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Debe retornar 401', () => pm.response.to.have.status(401));",
+                  "pm.test('success debe ser false', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.false;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"contraseniaErronea\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Verifica que credenciales incorrectas retornen 401 Unauthorized."
+          },
+          "response": []
+        }
+      ]
+    },
+
+    {
+      "name": "1. OBSERVABILIDAD — Health & Docs",
+      "description": "## Observabilidad\n\nEstos endpoints son **públicos** — no requieren token JWT.\n\n- **Health**: estado de la aplicación, BD y componentes\n- **Metrics**: métricas de JVM, memoria, HTTP\n- **Swagger UI**: documentación interactiva de todos los endpoints",
+      "item": [
+        {
+          "name": "Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Aplicación UP', () => pm.response.to.have.status(200));",
+                  "pm.test('Status es UP', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.status).to.eql('UP');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/actuator/health",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "actuator", "health"]
+            },
+            "description": "Verifica el estado de la aplicación y sus componentes (BD H2, disco, etc.).\n\n**Respuesta esperada:**\n```json\n{\n  \"status\": \"UP\",\n  \"components\": {\n    \"db\": { \"status\": \"UP\", \"details\": { \"database\": \"H2\" } },\n    \"diskSpace\": { \"status\": \"UP\" }\n  }\n}\n```"
+          },
+          "response": []
+        },
+        {
+          "name": "Métricas JVM",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/actuator/metrics",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "actuator", "metrics"]
+            },
+            "description": "Lista todas las métricas disponibles (JVM, HTTP, memoria, threads, etc.)."
+          },
+          "response": []
+        },
+        {
+          "name": "Métricas — Uso de memoria JVM",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/actuator/metrics/jvm.memory.used",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "actuator", "metrics", "jvm.memory.used"]
+            },
+            "description": "Memoria JVM usada actualmente. Reemplaza `jvm.memory.used` por cualquier métrica del listado anterior."
+          },
+          "response": []
+        },
+        {
+          "name": "Swagger UI (abrir en browser)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/swagger-ui/index.html",
+              "host": ["{{base_url}}"],
+              "path": ["swagger-ui", "index.html"]
+            },
+            "description": "Documentación interactiva de la API. Abrir en el browser para explorar y ejecutar requests desde la UI de Swagger."
+          },
+          "response": []
+        },
+        {
+          "name": "OpenAPI Spec (JSON)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v3/api-docs",
+              "host": ["{{base_url}}"],
+              "path": ["v3", "api-docs"]
+            },
+            "description": "Especificación OpenAPI 3.0 en formato JSON. Útil para generar clientes o importar en otras herramientas."
+          },
+          "response": []
+        }
+      ]
+    },
+
+    {
+      "name": "2. CREAR ÍTEMS — POST /api/v1/models",
+      "description": "## Crear Ítems\n\nTodos los campos marcados como obligatorios deben estar presentes.\nRetorna **201 Created** con el ID y nombre del ítem creado.\n\n**Campos obligatorios:** `id`, `name`, `description`, `category`, `price`, `brand`, `model`, `stock`, `isAvailable`, `isNew`, `condition`, `vendorId`, `vendorName`, `paymentMethods` (≥1), `imageUrls` (≥1), `mainImageUrl`",
+      "item": [
+        {
+          "name": "Crear Ítem #1 — Laptop completa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Creado con 201', () => pm.response.to.have.status(201));",
+                  "pm.test('success = true', () => pm.expect(pm.response.json().success).to.be.true);",
+                  "pm.test('ID correcto', () => pm.expect(pm.response.json().id).to.eql(1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"name\": \"Laptop Lenovo IdeaPad 3\",\n  \"description\": \"Laptop ideal para trabajo y estudio con procesador Intel Core i5 de 11va generación y 8GB RAM\",\n  \"category\": \"Computación\",\n  \"price\": 1500.00,\n  \"discountPercentage\": 10.00,\n  \"installmentMonths\": 12,\n  \"color\": \"Gris Platino\",\n  \"size\": \"15.6 pulgadas\",\n  \"material\": \"Plástico ABS\",\n  \"brand\": \"Lenovo\",\n  \"model\": \"IdeaPad 3 15ITL6\",\n  \"stock\": 25,\n  \"isAvailable\": true,\n  \"isNew\": true,\n  \"condition\": \"Nueva\",\n  \"rating\": 4.5,\n  \"reviewCount\": 248,\n  \"vendorId\": 101,\n  \"vendorName\": \"TechStore Oficial\",\n  \"vendorRating\": 4.8,\n  \"vendorReviewCount\": 1523,\n  \"paymentMethods\": [\"Tarjeta de Crédito\", \"Transferencia Bancaria\", \"Efectivo\", \"MercadoPago\"],\n  \"imageUrls\": [\n    \"https://img.example.com/lenovo-ideapad-front.jpg\",\n    \"https://img.example.com/lenovo-ideapad-side.jpg\",\n    \"https://img.example.com/lenovo-ideapad-keyboard.jpg\"\n  ],\n  \"mainImageUrl\": \"https://img.example.com/lenovo-ideapad-front.jpg\",\n  \"status\": \"ACTIVO\",\n  \"hasWarranty\": true,\n  \"warrantyInfo\": \"12 meses garantía oficial Lenovo\",\n  \"isFreeShipping\": true,\n  \"shippingCost\": 0.00,\n  \"estimatedShippingDays\": 3,\n  \"sku\": \"LEN-IDP3-15ITL6-GRY\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models"]
+            },
+            "description": "Crea un ítem completo con todos los campos del modelo de producto expandido."
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Ítem #2 — Smartphone",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Creado con 201', () => pm.response.to.have.status(201));",
+                  "pm.test('success = true', () => pm.expect(pm.response.json().success).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 2,\n  \"name\": \"Samsung Galaxy S24 Ultra 256GB\",\n  \"description\": \"Smartphone flagship con cámara de 200MP, S Pen integrado y pantalla Dynamic AMOLED 2X de 6.8 pulgadas\",\n  \"category\": \"Celulares y Teléfonos\",\n  \"price\": 2199.99,\n  \"discountPercentage\": 5.00,\n  \"installmentMonths\": 24,\n  \"color\": \"Titanium Black\",\n  \"size\": \"6.8 pulgadas\",\n  \"material\": \"Titanio / Gorilla Glass Armor\",\n  \"brand\": \"Samsung\",\n  \"model\": \"Galaxy S24 Ultra\",\n  \"stock\": 12,\n  \"isAvailable\": true,\n  \"isNew\": true,\n  \"condition\": \"Nueva\",\n  \"rating\": 4.9,\n  \"reviewCount\": 3872,\n  \"vendorId\": 102,\n  \"vendorName\": \"Samsung Store Oficial\",\n  \"vendorRating\": 4.9,\n  \"vendorReviewCount\": 8543,\n  \"paymentMethods\": [\"Tarjeta de Crédito\", \"Tarjeta de Débito\", \"MercadoPago\"],\n  \"imageUrls\": [\n    \"https://img.example.com/samsung-s24-front.jpg\",\n    \"https://img.example.com/samsung-s24-back.jpg\"\n  ],\n  \"mainImageUrl\": \"https://img.example.com/samsung-s24-front.jpg\",\n  \"status\": \"ACTIVO\",\n  \"hasWarranty\": true,\n  \"warrantyInfo\": \"12 meses garantía oficial Samsung\",\n  \"isFreeShipping\": true,\n  \"shippingCost\": 0.00,\n  \"estimatedShippingDays\": 1,\n  \"sku\": \"SAM-S24U-256-BLK\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models"]
+            },
+            "description": "Crea un smartphone con alto rating y múltiples cuotas."
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Ítem #3 — Producto usado con envío pago",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 3,\n  \"name\": \"Bicicleta Mountain Trek 3500 Aluminio\",\n  \"description\": \"Bicicleta de montaña en excelente estado, rodado 29, marco de aluminio liviano, 21 velocidades Shimano, usada solo 6 meses\",\n  \"category\": \"Deportes y Fitness\",\n  \"price\": 450.00,\n  \"discountPercentage\": 0.00,\n  \"installmentMonths\": 6,\n  \"color\": \"Rojo y Negro\",\n  \"size\": \"Talle M\",\n  \"material\": \"Aluminio 6061\",\n  \"brand\": \"Trek\",\n  \"model\": \"3500 Disc\",\n  \"stock\": 1,\n  \"isAvailable\": true,\n  \"isNew\": false,\n  \"condition\": \"Usado\",\n  \"rating\": 4.2,\n  \"reviewCount\": 0,\n  \"vendorId\": 201,\n  \"vendorName\": \"SportStore BA\",\n  \"vendorRating\": 3.9,\n  \"vendorReviewCount\": 312,\n  \"paymentMethods\": [\"Efectivo\", \"Transferencia Bancaria\"],\n  \"imageUrls\": [\n    \"https://img.example.com/trek-3500-general.jpg\",\n    \"https://img.example.com/trek-3500-detalle.jpg\"\n  ],\n  \"mainImageUrl\": \"https://img.example.com/trek-3500-general.jpg\",\n  \"status\": \"ACTIVO\",\n  \"hasWarranty\": false,\n  \"isFreeShipping\": false,\n  \"shippingCost\": 35.00,\n  \"estimatedShippingDays\": 7,\n  \"sku\": \"TRK-3500-M-RJ\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models"]
+            },
+            "description": "Ítem de segunda mano (isNew=false, condition=Usado) sin garantía y con envío con costo."
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Ítem — ID duplicado → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Debe retornar 400', () => pm.response.to.have.status(400));",
+                  "pm.test('success = false', () => pm.expect(pm.response.json().success).to.be.false);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"name\": \"Producto duplicado\",\n  \"description\": \"Este request falla porque el ID 1 ya existe en la base de datos\",\n  \"category\": \"Test\",\n  \"price\": 100.00,\n  \"brand\": \"Test\",\n  \"model\": \"Test-001\",\n  \"stock\": 1,\n  \"isAvailable\": true,\n  \"isNew\": true,\n  \"condition\": \"Nueva\",\n  \"vendorId\": 999,\n  \"vendorName\": \"Vendedor Test\",\n  \"paymentMethods\": [\"Efectivo\"],\n  \"imageUrls\": [\"https://img.example.com/test.jpg\"],\n  \"mainImageUrl\": \"https://img.example.com/test.jpg\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models"]
+            },
+            "description": "Intenta crear un ítem con ID ya existente. Debe retornar **400 Bad Request** con `success: false`."
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Ítem — Validación fallida (campos faltantes) → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Debe retornar 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Contiene fieldErrors', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.fieldErrors).to.be.an('object');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 999,\n  \"name\": \"Solo nombre\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models"]
+            },
+            "description": "Envía solo `id` y `name`. Debe retornar **400** con `fieldErrors` indicando todos los campos faltantes."
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Ítem — Sin token → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Debe retornar 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 998,\n  \"name\": \"Request sin autenticación\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models"]
+            },
+            "description": "Request POST sin header `Authorization`. Debe retornar **401 Unauthorized**."
+          },
+          "response": []
+        }
+      ]
+    },
+
+    {
+      "name": "3. LISTAR ÍTEMS — GET /api/v1/models",
+      "description": "## Listar Ítems con Paginación\n\nSoporta los siguientes query params:\n- `page`: número de página (base 0, default: 0)\n- `size`: elementos por página (default: 10)\n- `sort`: campo de ordenamiento (default: id)\n- `direction`: `asc` o `desc` (default: asc)\n\nLa respuesta incluye metadata de paginación completa.",
+      "item": [
+        {
+          "name": "Listar — Primera página (default)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('success = true', () => pm.expect(pm.response.json().success).to.be.true);",
+                  "pm.test('data es array', () => pm.expect(pm.response.json().data).to.be.an('array'));",
+                  "pm.test('pagination presente', () => pm.expect(pm.response.json().pagination).to.exist);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models"]
+            },
+            "description": "Lista todos los ítems con paginación por defecto (página 0, size 10, ordenado por id asc)."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar — Paginación custom (page=0, size=2)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/models?page=0&size=2&sort=id&direction=asc",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models"],
+              "query": [
+                { "key": "page", "value": "0", "description": "Número de página (0-based)" },
+                { "key": "size", "value": "2", "description": "Ítems por página" },
+                { "key": "sort", "value": "id", "description": "Campo de ordenamiento" },
+                { "key": "direction", "value": "asc", "description": "asc o desc" }
+              ]
+            },
+            "description": "Muestra solo 2 ítems por página ordenados por ID ascendente. Útil para ver el funcionamiento de la paginación."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar — Ordenado por precio (mayor a menor)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/models?page=0&size=10&sort=price&direction=desc",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "sort", "value": "price", "description": "Ordenar por precio" },
+                { "key": "direction", "value": "desc", "description": "De mayor a menor" }
+              ]
+            },
+            "description": "Lista los ítems ordenados por precio de mayor a menor — útil para encontrar los más caros primero."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar — Ordenado por nombre (A-Z)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/models?page=0&size=10&sort=name&direction=asc",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "sort", "value": "name" },
+                { "key": "direction", "value": "asc" }
+              ]
+            },
+            "description": "Lista los ítems ordenados alfabéticamente por nombre."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar — Segunda página",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/models?page=1&size=2&sort=id&direction=asc",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models"],
+              "query": [
+                { "key": "page", "value": "1", "description": "Segunda página (base 0)" },
+                { "key": "size", "value": "2" },
+                { "key": "sort", "value": "id" },
+                { "key": "direction", "value": "asc" }
+              ]
+            },
+            "description": "Navega a la segunda página del listado paginado. Verifica los campos `hasNext`, `hasPrevious` en la metadata de paginación."
+          },
+          "response": []
+        }
+      ]
+    },
+
+    {
+      "name": "4. DETALLE DE ÍTEM — GET /api/v1/models/{id}",
+      "description": "## Detalle de Ítem por ID\n\n**Endpoint principal de la API** — provee todos los datos necesarios para renderizar una página de detalle de producto en MercadoLibre.\n\nURL: `GET /api/v1/models/{id}` donde `{id}` es el ID numérico del ítem.\n\nRetorna 200 con el objeto completo o 404 si no existe.",
+      "item": [
+        {
+          "name": "Detalle Ítem #1 — Laptop",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('success = true', () => pm.expect(pm.response.json().success).to.be.true);",
+                  "pm.test('data contiene id', () => pm.expect(pm.response.json().data.id).to.eql(1));",
+                  "pm.test('data contiene name', () => pm.expect(pm.response.json().data.name).to.exist);",
+                  "pm.test('data contiene price', () => pm.expect(pm.response.json().data.price).to.exist);",
+                  "pm.test('data contiene vendorName', () => pm.expect(pm.response.json().data.vendorName).to.exist);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/models/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models", "1"]
+            },
+            "description": "Retorna todos los datos del ítem #1 (Laptop Lenovo). Es el **endpoint principal** para la página de detalle de producto."
+          },
+          "response": []
+        },
+        {
+          "name": "Detalle Ítem #2 — Smartphone",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/models/2",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models", "2"]
+            },
+            "description": "Detalle del ítem #2 (Samsung Galaxy S24 Ultra)."
+          },
+          "response": []
+        },
+        {
+          "name": "Detalle Ítem #3 — Bicicleta usada",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/models/3",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models", "3"]
+            },
+            "description": "Detalle del ítem #3 (Bicicleta Trek usada). Verifica los campos `isNew: false`, `condition: Usado`, `isFreeShipping: false`."
+          },
+          "response": []
+        },
+        {
+          "name": "Detalle Ítem — ID inexistente → 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Debe retornar 404', () => pm.response.to.have.status(404));",
+                  "pm.test('success = false', () => pm.expect(pm.response.json().success).to.be.false);",
+                  "pm.test('message presente', () => pm.expect(pm.response.json().message).to.exist);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/models/9999",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models", "9999"]
+            },
+            "description": "Solicita un ID que no existe en la base de datos. Debe retornar **404** con `success: false` y mensaje de error."
+          },
+          "response": []
+        }
+      ]
+    },
+
+    {
+      "name": "5. ACTUALIZAR ÍTEM — PUT /api/v1/models",
+      "description": "## Actualización Parcial\n\nSolo el campo `id` es obligatorio. El resto son **opcionales** — se actualiza únicamente lo que se incluya en el body.\n\nEsto permite hacer actualizaciones quirúrgicas sin necesidad de enviar todo el objeto.",
+      "item": [
+        {
+          "name": "Actualizar — Solo precio y stock",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('success = true', () => pm.expect(pm.response.json().success).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"price\": 1299.99,\n  \"stock\": 20\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models"]
+            },
+            "description": "Actualiza precio y stock del ítem #1. El resto de campos se mantiene igual. Luego usa **GET /models/1** para verificar el cambio."
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar — Agregar descuento",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 2,\n  \"discountPercentage\": 15.00\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models"]
+            },
+            "description": "Aumenta el descuento del Samsung al 15%. Solo se envía `id` y `discountPercentage`."
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar — Cambiar nombre y categoría",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 3,\n  \"name\": \"Bicicleta de Montaña Trek 3500 — REBAJADA\",\n  \"status\": \"ACTIVO\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models"]
+            },
+            "description": "Renombra el ítem #3 y confirma su status sin tocar ningún otro campo."
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar — Marcar sin stock",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"stock\": 0,\n  \"isAvailable\": false\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models"]
+            },
+            "description": "Marca el ítem #1 como sin stock y no disponible. Simula un agotamiento de inventario."
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar — ID inexistente → 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Debe retornar 404', () => pm.response.to.have.status(404));",
+                  "pm.test('success = false', () => pm.expect(pm.response.json().success).to.be.false);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 9999,\n  \"name\": \"Este ítem no existe\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models"]
+            },
+            "description": "Intenta actualizar un ID que no existe. Debe retornar **404**."
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar — Precio negativo → 400 (validación)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Debe retornar 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Contiene fieldErrors', () => pm.expect(pm.response.json().fieldErrors).to.exist);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"price\": -50.00\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models"]
+            },
+            "description": "Envía un precio negativo. Debe retornar **400** con `fieldErrors.price` describiendo la violación de validación."
+          },
+          "response": []
+        }
+      ]
+    },
+
+    {
+      "name": "6. ELIMINAR ÍTEMS — DELETE /api/v1/models/{id}",
+      "description": "## Eliminar por ID\n\nURL: `DELETE /api/v1/models/{id}`\n\nRetorna 200 con confirmación o 404 si el ítem no existe.\n\n> **Nota:** `DELETE /api/v1/models/erase` elimina **todos** los ítems a la vez.",
+      "item": [
+        {
+          "name": "Eliminar Ítem #3",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('success = true', () => pm.expect(pm.response.json().success).to.be.true);",
+                  "pm.test('ID confirmado', () => pm.expect(pm.response.json().id).to.eql(3));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/models/3",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models", "3"]
+            },
+            "description": "Elimina el ítem #3 (Bicicleta Trek). La respuesta incluye el ID eliminado y un mensaje de confirmación."
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar — ID ya eliminado → 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Debe retornar 404', () => pm.response.to.have.status(404));",
+                  "pm.test('success = false', () => pm.expect(pm.response.json().success).to.be.false);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/models/3",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models", "3"]
+            },
+            "description": "Intenta eliminar el ítem #3 que ya fue eliminado anteriormente. Debe retornar **404**."
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar — ID inexistente → 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Debe retornar 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/models/8888",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models", "8888"]
+            },
+            "description": "Intenta eliminar un ID que nunca existió. Debe retornar **404**."
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar — Sin token → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Debe retornar 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/models/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models", "1"]
+            },
+            "description": "Request DELETE sin header Authorization. Debe retornar **401 Unauthorized**."
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar TODOS — DELETE /models/erase",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('success = true', () => pm.expect(pm.response.json().success).to.be.true);",
+                  "console.log('⚠️  Todos los ítems fueron eliminados');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/models/erase",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models", "erase"]
+            },
+            "description": "⚠️ **Elimina TODOS los ítems** de la base de datos de una sola vez.\n\nÚtil para resetear el estado antes de una demostración. La base de datos queda vacía pero la aplicación sigue corriendo."
+          },
+          "response": []
+        }
+      ]
+    },
+
+    {
+      "name": "7. FLUJO COMPLETO — Happy Path",
+      "description": "## Flujo completo de demostración\n\nEjecuta estos requests **en orden** para ver el ciclo completo de vida de un ítem:\n\n1. Limpiar BD\n2. Login\n3. Crear ítem\n4. Verificar detalle\n5. Actualizar precio\n6. Verificar cambio\n7. Eliminar\n8. Verificar 404\n\nCada request tiene assertions automáticas en la pestaña **Tests**.",
+      "item": [
+        {
+          "name": "PASO 1 — Limpiar base de datos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('[PASO 1] BD limpiada', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/models/erase",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models", "erase"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PASO 2 — Login y guardar token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('token', json.token);",
+                  "pm.test('[PASO 2] Login OK, token guardado', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"password123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PASO 3 — Crear ítem de prueba",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('[PASO 3] Ítem creado (201)', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 10,\n  \"name\": \"Auriculares Sony WH-1000XM5\",\n  \"description\": \"Auriculares inalámbricos premium con cancelación de ruido líder en la industria, hasta 30hs de batería\",\n  \"category\": \"Electrónica\",\n  \"price\": 399.00,\n  \"discountPercentage\": 0.00,\n  \"installmentMonths\": 6,\n  \"color\": \"Negro\",\n  \"brand\": \"Sony\",\n  \"model\": \"WH-1000XM5\",\n  \"stock\": 8,\n  \"isAvailable\": true,\n  \"isNew\": true,\n  \"condition\": \"Nueva\",\n  \"rating\": 4.8,\n  \"reviewCount\": 5021,\n  \"vendorId\": 301,\n  \"vendorName\": \"Sony Store\",\n  \"vendorRating\": 4.9,\n  \"vendorReviewCount\": 2100,\n  \"paymentMethods\": [\"Tarjeta de Crédito\", \"MercadoPago\"],\n  \"imageUrls\": [\"https://img.example.com/sony-wh1000xm5.jpg\"],\n  \"mainImageUrl\": \"https://img.example.com/sony-wh1000xm5.jpg\",\n  \"status\": \"ACTIVO\",\n  \"hasWarranty\": true,\n  \"warrantyInfo\": \"12 meses garantía oficial Sony\",\n  \"isFreeShipping\": true,\n  \"estimatedShippingDays\": 2\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PASO 4 — Obtener detalle del ítem creado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('[PASO 4] Detalle obtenido (200)', () => pm.response.to.have.status(200));",
+                  "pm.test('[PASO 4] Precio original = 399', () => {",
+                  "    pm.expect(pm.response.json().data.price).to.eql(399.00);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/models/10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models", "10"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PASO 5 — Actualizar precio con descuento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('[PASO 5] Actualización exitosa (200)', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 10,\n  \"price\": 349.00,\n  \"discountPercentage\": 12.5\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/models",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PASO 6 — Verificar precio actualizado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('[PASO 6] Precio actualizado = 349', () => {",
+                  "    pm.expect(pm.response.json().data.price).to.eql(349.00);",
+                  "});",
+                  "pm.test('[PASO 6] Descuento = 12.5', () => {",
+                  "    pm.expect(pm.response.json().data.discountPercentage).to.eql(12.50);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/models/10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models", "10"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PASO 7 — Eliminar ítem",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('[PASO 7] Eliminado (200)', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/models/10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models", "10"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PASO 8 — Verificar que ya no existe → 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('[PASO 8] Ítem no existe (404)', () => pm.response.to.have.status(404));",
+                  "console.log('✅ Flujo completo ejecutado correctamente');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/models/10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "models", "10"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+
+  ]
+}

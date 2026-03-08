@@ -2,6 +2,7 @@ package com.hackerrank.sample.controller;
 
 import com.hackerrank.sample.audit.AuditService;
 import com.hackerrank.sample.dto.ModelOperationRequest;
+import com.hackerrank.sample.dto.UpdateModelRequest;
 import com.hackerrank.sample.model.Model;
 import com.hackerrank.sample.security.AuthService;
 import com.hackerrank.sample.service.ModelService;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,7 +32,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -231,24 +232,24 @@ public class ModelController {
     /**
      * Obtener modelo por ID
      * Requiere autenticación via JWT token
-     * GET /api/v1/models/details con body {"id": 1}
+     * GET /api/v1/models/{id}
      */
-    @GetMapping("/models/details")
+    @GetMapping("/models/{id}")
     @ResponseStatus(HttpStatus.OK)
     @CircuitBreaker(name = "modelService", fallbackMethod = "fallbackGetModel")
     @Retry(name = "modelService")
     public ResponseEntity<?> getModelById(
-            @RequestBody @Valid ModelOperationRequest request,
+            @PathVariable Long id,
             HttpServletRequest httpRequest) {
         
         String username = extractUsername(httpRequest);
         
         try {
-            Model model = modelService.getModelById(request.getId());
+            Model model = modelService.getModelById(id);
             
             auditService.logOperation(
-                username, "ModelService", "POST", "/api/v1/models/details",
-                "GET_MODEL", "SUCCESS", "200", "Model ID: " + request.getId()
+                username, "ModelService", "GET", "/api/v1/models/details",
+                "GET_MODEL", "SUCCESS", "200", "Model ID: " + id
             );
             
             Map<String, Object> response = new HashMap<>();
@@ -256,14 +257,14 @@ public class ModelController {
             response.put("data", model);
             response.put("timestamp", LocalDateTime.now());
             
-            log.info("[API] Usuario: {} - Obtuvo modelo ID: {} - Status: 200", username, request.getId());
+            log.info("[API] Usuario: {} - Obtuvo modelo ID: {} - Status: 200", username, id);
             
             return new ResponseEntity<>(response, HttpStatus.OK);
             
         } catch (Exception e) {
             auditService.logOperation(
-                username, "ModelService", "POST", "/api/v1/models/details",
-                "GET_MODEL", "FAILED", "404", "Model ID: " + request.getId()
+                username, "ModelService", "GET", "/api/v1/models/details",
+                "GET_MODEL", "FAILED", "404", "Model ID: " + id
             );
             
             Map<String, Object> error = new HashMap<>();
@@ -271,7 +272,7 @@ public class ModelController {
             error.put("message", e.getMessage());
             error.put("timestamp", LocalDateTime.now());
             
-            log.error("[API] Usuario: {} - Modelo no encontrado ID: {}", username, request.getId());
+            log.error("[API] Usuario: {} - Modelo no encontrado ID: {}", username, id);
             
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
@@ -280,14 +281,14 @@ public class ModelController {
     /**
      * Actualizar modelo por ID
      * Requiere autenticación via JWT token
-     * PUT /api/v1/models con body con todos los campos a actualizar
+     * PUT /api/v1/models con body con los campos a actualizar (todos opcionales excepto ID)
      */
     @PutMapping("/models")
     @ResponseStatus(HttpStatus.OK)
     @CircuitBreaker(name = "modelService", fallbackMethod = "fallbackUpdateModel")
     @Retry(name = "modelService")
     public ResponseEntity<?> updateModel(
-            @RequestBody @Valid ModelOperationRequest request,
+            @RequestBody @Valid UpdateModelRequest request,
             HttpServletRequest httpRequest) {
         
         String username = extractUsername(httpRequest);
@@ -376,34 +377,34 @@ public class ModelController {
     /**
      * Eliminar modelo por ID
      * Requiere autenticación via JWT token
-     * DELETE /api/v1/models con body {"id": 1}
+     * DELETE /api/v1/models/{id}
      * Retorna 404 si el modelo no existe
      */
-    @DeleteMapping("/models")
+    @DeleteMapping("/models/{id}")
     @ResponseStatus(HttpStatus.OK)
     @CircuitBreaker(name = "modelService", fallbackMethod = "fallbackDeleteModel")
     @Retry(name = "modelService")
     public ResponseEntity<?> deleteModelById(
-            @RequestBody @Valid ModelOperationRequest request,
+            @PathVariable Long id,
             HttpServletRequest httpRequest) {
         
         String username = extractUsername(httpRequest);
         
         try {
-            modelService.deleteModelById(request.getId());
+            modelService.deleteModelById(id);
             
             auditService.logOperation(
                 username, "ModelService", "DELETE", "/api/v1/models",
-                "DELETE_MODEL", "SUCCESS", "200", "Model ID: " + request.getId()
+                "DELETE_MODEL", "SUCCESS", "200", "Model ID: " + id
             );
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Modelo eliminado exitosamente");
-            response.put("id", request.getId());
+            response.put("id", id);
             response.put("timestamp", LocalDateTime.now());
             
-            log.info("[API] Usuario: {} - Eliminó modelo ID: {} - Status: 200", username, request.getId());
+            log.info("[API] Usuario: {} - Eliminó modelo ID: {} - Status: 200", username, id);
             
             return new ResponseEntity<>(response, HttpStatus.OK);
             
@@ -418,7 +419,7 @@ public class ModelController {
             error.put("message", e.getMessage());
             error.put("timestamp", LocalDateTime.now());
             
-            log.error("[API] Usuario: {} - Modelo no encontrado para eliminar ID: {}", username, request.getId());
+            log.error("[API] Usuario: {} - Modelo no encontrado para eliminar ID: {}", username, id);
             
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
@@ -488,27 +489,27 @@ public class ModelController {
         );
     }
     
-    public ResponseEntity<?> fallbackGetModel(ModelOperationRequest request, HttpServletRequest httpRequest, Exception ex) {
+    public ResponseEntity<?> fallbackGetModel(Long id, HttpServletRequest httpRequest, Exception ex) {
         String username = extractUsername(httpRequest);
-        log.warn("[API-FALLBACK] Usuario: {} - CircuitBreaker abierto en getModel: {}", username, ex.getMessage());
+        log.warn("[API-FALLBACK] Usuario: {} - CircuitBreaker abierto en getModel ID {}: {}", username, id, ex.getMessage());
         return new ResponseEntity<>(
             Map.of("success", false, "message", "Servicio temporalmente no disponible"),
             HttpStatus.SERVICE_UNAVAILABLE
         );
     }
     
-    public ResponseEntity<?> fallbackUpdateModel(ModelOperationRequest request, HttpServletRequest httpRequest, Exception ex) {
+    public ResponseEntity<?> fallbackUpdateModel(UpdateModelRequest request, HttpServletRequest httpRequest, Exception ex) {
         String username = extractUsername(httpRequest);
-        log.warn("[API-FALLBACK] Usuario: {} - CircuitBreaker abierto en updateModel: {}", username, ex.getMessage());
+        log.warn("[API-FALLBACK] Usuario: {} - CircuitBreaker abierto en updateModel ID {}: {}", username, request != null ? request.getId() : "?", ex.getMessage());
         return new ResponseEntity<>(
             Map.of("success", false, "message", "Servicio temporalmente no disponible"),
             HttpStatus.SERVICE_UNAVAILABLE
         );
     }
     
-    public ResponseEntity<?> fallbackDeleteModel(ModelOperationRequest request, HttpServletRequest httpRequest, Exception ex) {
+    public ResponseEntity<?> fallbackDeleteModel(Long id, HttpServletRequest httpRequest, Exception ex) {
         String username = extractUsername(httpRequest);
-        log.warn("[API-FALLBACK] Usuario: {} - CircuitBreaker abierto en deleteModel: {}", username, ex.getMessage());
+        log.warn("[API-FALLBACK] Usuario: {} - CircuitBreaker abierto en deleteModel ID {}: {}", username, id, ex.getMessage());
         return new ResponseEntity<>(
             Map.of("success", false, "message", "Servicio temporalmente no disponible"),
             HttpStatus.SERVICE_UNAVAILABLE

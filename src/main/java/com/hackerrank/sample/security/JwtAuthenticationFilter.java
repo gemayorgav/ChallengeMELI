@@ -9,9 +9,12 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Filtro que valida JWT tokens en las peticiones
@@ -21,6 +24,9 @@ public class JwtAuthenticationFilter implements Filter {
     
     @Autowired
     private AuthService authService;
+    
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
     
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -74,6 +80,12 @@ public class JwtAuthenticationFilter implements Filter {
             httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido");
             return;
         }
+        
+        // Extraer username del token y crear Authentication
+        String username = jwtTokenProvider.getUsernameFromToken(token);
+        UsernamePasswordAuthenticationToken authentication = 
+            new UsernamePasswordAuthenticationToken(username, null, new ArrayList<>());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
         
         // Continuar con la cadena de filtros
         chain.doFilter(request, response);
