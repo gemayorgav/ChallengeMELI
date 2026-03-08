@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -206,8 +207,9 @@ public class ModelController {
     /**
      * Obtener modelo por ID
      * Requiere autenticación via JWT token
+     * GET /api/v1/models/details con body {"id": 1}
      */
-    @PostMapping("/models/details")
+    @GetMapping("/models/details")
     @ResponseStatus(HttpStatus.OK)
     @CircuitBreaker(name = "modelService", fallbackMethod = "fallbackGetModel")
     @Retry(name = "modelService")
@@ -246,6 +248,102 @@ public class ModelController {
             error.put("timestamp", LocalDateTime.now());
             
             log.error("[API] Usuario: {} - Modelo no encontrado ID: {}", username, request.getId());
+            
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
+     * Actualizar modelo por ID
+     * Requiere autenticación via JWT token
+     * PUT /api/v1/models con body con todos los campos a actualizar
+     */
+    @PutMapping("/models")
+    @ResponseStatus(HttpStatus.OK)
+    @CircuitBreaker(name = "modelService", fallbackMethod = "fallbackUpdateModel")
+    @Retry(name = "modelService")
+    public ResponseEntity<?> updateModel(
+            @RequestBody @Valid ModelOperationRequest request,
+            HttpServletRequest httpRequest) {
+        
+        String username = extractUsername(httpRequest);
+        
+        try {
+            // Obtener modelo existente
+            Model model = modelService.getModelById(request.getId());
+            
+            // Actualizar campos proporcionados
+            if(request.getName() != null) model.setName(request.getName());
+            if(request.getDescription() != null) model.setDescription(request.getDescription());
+            if(request.getCategory() != null) model.setCategory(request.getCategory());
+            
+            if(request.getPrice() != null) model.setPrice(request.getPrice());
+            if(request.getDiscountPercentage() != null) model.setDiscountPercentage(request.getDiscountPercentage());
+            if(request.getInstallmentMonths() != null) model.setInstallmentMonths(request.getInstallmentMonths());
+            
+            if(request.getColor() != null) model.setColor(request.getColor());
+            if(request.getSize() != null) model.setSize(request.getSize());
+            if(request.getMaterial() != null) model.setMaterial(request.getMaterial());
+            if(request.getBrand() != null) model.setBrand(request.getBrand());
+            if(request.getModel() != null) model.setModel(request.getModel());
+            
+            if(request.getStock() != null) model.setStock(request.getStock());
+            if(request.getIsAvailable() != null) model.setIsAvailable(request.getIsAvailable());
+            
+            if(request.getIsNew() != null) model.setIsNew(request.getIsNew());
+            if(request.getCondition() != null) model.setCondition(request.getCondition());
+            
+            if(request.getRating() != null) model.setRating(request.getRating());
+            if(request.getReviewCount() != null) model.setReviewCount(request.getReviewCount());
+            
+            if(request.getVendorId() != null) model.setVendorId(request.getVendorId());
+            if(request.getVendorName() != null) model.setVendorName(request.getVendorName());
+            if(request.getVendorRating() != null) model.setVendorRating(request.getVendorRating());
+            if(request.getVendorReviewCount() != null) model.setVendorReviewCount(request.getVendorReviewCount());
+            
+            if(request.getPaymentMethods() != null) model.setPaymentMethods(request.getPaymentMethods());
+            if(request.getImageUrls() != null) model.setImageUrls(request.getImageUrls());
+            if(request.getMainImageUrl() != null) model.setMainImageUrl(request.getMainImageUrl());
+            
+            if(request.getStatus() != null) model.setStatus(request.getStatus());
+            if(request.getHasWarranty() != null) model.setHasWarranty(request.getHasWarranty());
+            if(request.getWarrantyInfo() != null) model.setWarrantyInfo(request.getWarrantyInfo());
+            if(request.getIsFreeShipping() != null) model.setIsFreeShipping(request.getIsFreeShipping());
+            if(request.getShippingCost() != null) model.setShippingCost(request.getShippingCost());
+            if(request.getEstimatedShippingDays() != null) model.setEstimatedShippingDays(request.getEstimatedShippingDays());
+            if(request.getSku() != null) model.setSku(request.getSku());
+            
+            modelService.updateModel(model);
+            
+            auditService.logOperation(
+                username, "ModelService", "PUT", "/api/v1/models",
+                "UPDATE_MODEL", "SUCCESS", "200", "Model ID: " + request.getId() + " | Name: " + request.getName()
+            );
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Modelo actualizado exitosamente");
+            response.put("id", request.getId());
+            response.put("name", request.getName());
+            response.put("timestamp", LocalDateTime.now());
+            
+            log.info("[API] Usuario: {} - Actualizó modelo ID: {} - Nombre: {} - Status: 200", 
+                username, request.getId(), request.getName());
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            auditService.logOperation(
+                username, "ModelService", "PUT", "/api/v1/models",
+                "UPDATE_MODEL", "FAILED", "404", e.getMessage()
+            );
+            
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", e.getMessage());
+            error.put("timestamp", LocalDateTime.now());
+            
+            log.error("[API] Usuario: {} - Error actualizando modelo ID: {}", username, request.getId());
             
             return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
         }
@@ -369,6 +467,15 @@ public class ModelController {
     public ResponseEntity<?> fallbackGetModel(ModelOperationRequest request, HttpServletRequest httpRequest, Exception ex) {
         String username = extractUsername(httpRequest);
         log.warn("[API-FALLBACK] Usuario: {} - CircuitBreaker abierto en getModel: {}", username, ex.getMessage());
+        return new ResponseEntity<>(
+            Map.of("success", false, "message", "Servicio temporalmente no disponible"),
+            HttpStatus.SERVICE_UNAVAILABLE
+        );
+    }
+    
+    public ResponseEntity<?> fallbackUpdateModel(ModelOperationRequest request, HttpServletRequest httpRequest, Exception ex) {
+        String username = extractUsername(httpRequest);
+        log.warn("[API-FALLBACK] Usuario: {} - CircuitBreaker abierto en updateModel: {}", username, ex.getMessage());
         return new ResponseEntity<>(
             Map.of("success", false, "message", "Servicio temporalmente no disponible"),
             HttpStatus.SERVICE_UNAVAILABLE

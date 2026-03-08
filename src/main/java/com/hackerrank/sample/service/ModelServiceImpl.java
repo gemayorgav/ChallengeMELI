@@ -40,6 +40,17 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
+    public void updateModel(Model model) {
+        Optional<Model> existingModel = modelRepository.findById(model.getId());
+
+        if (existingModel.isEmpty()) {
+            throw new NoSuchResourceFoundException("No model with given id found.");
+        }
+
+        modelRepository.save(model);
+    }
+
+    @Override
     public Model getModelById(Long id) {
         Optional<Model> model = modelRepository.findById(id);
 

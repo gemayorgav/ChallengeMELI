@@ -8,6 +8,8 @@ public interface ModelService {
     void deleteModelById(Long id);
 
     void createModel(Model model);
+    
+    void updateModel(Model model);
 
     Model getModelById(Long id);
 
