@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}/}spring.log}"/>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <!-- ===== CONSOLE OUTPUT (Desarrollo) ===== -->
+    <!-- Logs en texto para desarrollo local (readable) -->
+    <appender name="CONSOLE_TEXT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- ===== JSON APPENDER (Producción / ELK Stack) ===== -->
+    <!-- Logs en JSON para enviar a ELK Stack, Datadog, etc. -->
+    <appender name="JSON_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}</file>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <!-- Campos estándar que Logstash espera -->
+            <includeMdcKeyName>traceId</includeMdcKeyName>
+            <includeMdcKeyName>userId</includeMdcKeyName>
+            <includeMdcKeyName>requestId</includeMdcKeyName>
+            <fieldName>message</fieldName>
+            <timeStampPattern>yyyy-MM-dd'T'HH:mm:ss.SSS'Z'</timeStampPattern>
+            <version>1</version>
+            <!-- Metadatos adicionales -->
+            <customFields>{"service":"MercadoLibre-ItemDetail-API","version":"1.0.0"}</customFields>
+        </encoder>
+        <!-- Rotación de logs: 10MB por archivo, máximo 30 días -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/archived/spring-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <!-- ===== CONFIGURACIÓN POR PROFILE ===== -->
+    <!-- Perfil de desarrollo: logs en consola (texto legible) -->
+    <springProfile name="dev,default">
+        <root level="DEBUG">
+            <appender-ref ref="CONSOLE_TEXT"/>
+        </root>
+        <logger name="com.hackerrank.sample" level="DEBUG"/>
+        <logger name="org.springframework" level="INFO"/>
+        <logger name="org.hibernate" level="WARN"/>
+    </springProfile>
+
+    <!-- Perfil de producción: logs en JSON a archivo (compatible con ELK) -->
+    <springProfile name="prod">
+        <root level="INFO">
+            <appender-ref ref="JSON_FILE"/>
+        </root>
+        <logger name="com.hackerrank.sample" level="INFO"/>
+        <logger name="org.springframework" level="WARN"/>
+        <logger name="org.hibernate" level="WARN"/>
+    </springProfile>
+
+    <!-- Nivel de logging por defecto -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE_TEXT"/>
+    </root>
+</configuration>

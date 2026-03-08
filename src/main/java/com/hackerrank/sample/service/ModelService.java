@@ -1,6 +1,8 @@
 package com.hackerrank.sample.service;
 
 import com.hackerrank.sample.model.Model;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface ModelService {
@@ -14,4 +16,6 @@ public interface ModelService {
     Model getModelById(Long id);
 
     List<Model> getAllModels();
+
+    Page<Model> getAllModelsPaginated(Pageable pageable);
 }

@@ -12,6 +12,10 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +24,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -160,33 +165,52 @@ public class ModelController {
     }
 
     /**
-     * Obtener todos los modelos
+     * Obtener todos los modelos con paginación
      * Requiere autenticación via JWT token
-     * GET /api/v1/models
+     * GET /api/v1/models?page=0&size=10&sort=name,asc
      */
     @GetMapping("/models")
     @ResponseStatus(HttpStatus.OK)
     @CircuitBreaker(name = "modelService", fallbackMethod = "fallbackListModels")
     @Retry(name = "modelService")
-    public ResponseEntity<?> getAllModels(HttpServletRequest httpRequest) {
+    public ResponseEntity<?> getAllModels(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sort,
+            @RequestParam(defaultValue = "asc") String direction,
+            HttpServletRequest httpRequest) {
         String username = extractUsername(httpRequest);
         
         try {
-            List<Model> models = modelService.getAllModels();
+            // Crear pageable con los parámetros proporcionados
+            Sort.Direction sortDir = "desc".equalsIgnoreCase(direction) ? Sort.Direction.DESC : Sort.Direction.ASC;
+            Pageable pageable = PageRequest.of(page, size, Sort.by(sortDir, sort));
+            
+            Page<Model> modelsPage = modelService.getAllModelsPaginated(pageable);
             
             auditService.logOperation(
                 username, "ModelService", "GET", "/api/v1/models",
                 "LIST_MODELS", "SUCCESS", "200", 
-                "Retrieved " + models.size() + " models"
+                "Retrieved " + modelsPage.getNumberOfElements() + " models (page " + page + ")"
             );
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
-            response.put("data", models);
-            response.put("count", models.size());
+            response.put("data", modelsPage.getContent());
+            response.put("pagination", Map.of(
+                "currentPage", modelsPage.getNumber(),
+                "pageSize", modelsPage.getSize(),
+                "totalElements", modelsPage.getTotalElements(),
+                "totalPages", modelsPage.getTotalPages(),
+                "isFirst", modelsPage.isFirst(),
+                "isLast", modelsPage.isLast(),
+                "hasNext", modelsPage.hasNext(),
+                "hasPrevious", modelsPage.hasPrevious()
+            ));
             response.put("timestamp", LocalDateTime.now());
             
-            log.info("[API] Usuario: {} - Listó {} modelos - Status: 200", username, models.size());
+            log.info("[API] Usuario: {} - Listó {} modelos (página {}/{}) - Status: 200", 
+                username, modelsPage.getNumberOfElements(), page, modelsPage.getTotalPages());
             
             return new ResponseEntity<>(response, HttpStatus.OK);
             
